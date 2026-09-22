@@ -1,10 +1,10 @@
 # Projet DreamPark — Partie 0
 
-## Spécification fonctionnelle
+## Spécification fonctionnelle et spécification des tests
 
-**Équipe :** 404 Places Not Found  
-**Membres :** Japhet KOYAKOSSO ESSO, Ayachi Mohamed  
-**Formation :** L3 MIASHS — Parcours Informatique et SHS  
+**Équipe :** 404 Places Not Found
+**Membres :** Japhet KOYAKOSSO ESSO (spécification des tests), Ayachi Mohamed (spécification fonctionnelle)
+**Formation :** L3 MIASHS — Parcours Informatique et SHS
 **Université :** Toulouse 2 — Jean-Jaurès
 
 ---
@@ -14,30 +14,28 @@
 Le projet consiste à concevoir un système de gestion des places et des services du parking DreamPark.
 
 Le parking est composé d'un ensemble de places et de deux accès. Chaque accès dispose :
-
 - d'une caméra ;
 - d'une borne à tickets-paiement ;
+- d'un panneau d'affichage ;
 - de deux téléporteurs.
 
-Chaque place possède un identifiant unique ainsi que des caractéristiques permettant d'identifier sa compatibilité avec les véhicules.
+Chaque place possède un identifiant unique ainsi que des caractéristiques (niveau, longueur, hauteur) permettant de déterminer sa compatibilité avec un véhicule.
 
-Lorsqu'une voiture entre dans le parking, le système lui attribue une place adaptée. Lorsqu'elle quitte le parking, la place est de nouveau disponible et le nombre de places disponibles est mis à jour.
+Lorsqu'une voiture entre dans le parking, le système lui attribue une place adaptée. Lorsqu'elle quitte le parking, la place est libérée et le nombre de places disponibles est mis à jour.
 
-Le parking propose également différents services, notamment l'abonnement, le pack garantie, la livraison, l'entretien et la maintenance.
+Le parking propose également différents services : abonnement, pack garantie, livraison, entretien, maintenance.
 
 ---
 
 # 2. Objectifs du système
 
 Le système DreamPark doit permettre :
-
 - de gérer les places de stationnement ;
 - d'identifier les véhicules ;
 - d'attribuer une place adaptée à chaque véhicule ;
 - de gérer l'entrée et la sortie des véhicules ;
 - de gérer les tickets ;
-- de gérer les abonnements ;
-- de gérer le pack garantie ;
+- de gérer les abonnements et le pack garantie ;
 - de proposer différents services aux abonnés ;
 - de gérer la livraison des véhicules ;
 - de conserver les informations relatives aux passages ;
@@ -47,65 +45,25 @@ Le système DreamPark doit permettre :
 
 # 3. Acteurs
 
-Les acteurs identifiés dans le système sont :
+Le cours distingue quatre catégories d'acteurs : **acteurs principaux** (utilisent les fonctions principales du système), **acteurs secondaires** (tâches administratives/maintenance), **matériel externe**, **autres systèmes**. Sur cette base, les acteurs de DreamPark se classent ainsi :
 
-- **Client**
-- **Abonné**
-- **Super_Abonné**
-- **Voiturier**
-- **Administrateur**
+| Acteur | Catégorie | Rôle |
+|---|---|---|
+| Client | Principal | Utilise le service de base : se garer, récupérer son véhicule, s'abonner |
+| Abonné | Principal (spécialisation de Client) | Bénéficie des services (maintenance, entretien, livraison) |
+| Super_Abonné | Principal (spécialisation de Client) | Bénéficie du pack garantie de stationnement |
+| Voiturier | Secondaire | Exécute les livraisons demandées |
+| Administrateur | Secondaire | Consulte et édite les statistiques |
 
-## 3.1 Client
-
-Le client utilise les services du parking.
-
-Il peut notamment :
-
-- entrer dans le parking ;
-- garer sa voiture ;
-- récupérer sa voiture ;
-- souscrire à un abonnement.
-
-## 3.2 Abonné
-
-L'abonné est un client ayant souscrit à un abonnement.
-
-Il peut bénéficier des services proposés par le parking, notamment :
-
-- la maintenance ;
-- l'entretien ;
-- la livraison de son véhicule.
-
-## 3.3 Super_Abonné
-
-Le Super_Abonné correspond au client bénéficiant du pack garantie de stationnement.
-
-Le pack permet au parking de garantir une solution de stationnement au client. Si nécessaire, le véhicule peut être garé dans un autre parking.
-
-Le sujet précise également que l'inscription au pack garantie permet de bénéficier des services proposés aux abonnés.
-
-## 3.4 Voiturier
-
-Le voiturier intervient principalement dans le service de livraison.
-
-Il peut récupérer et livrer le véhicule conformément à la demande du client.
-
-## 3.5 Administrateur
-
-L'administrateur intervient dans la consultation et l'exploitation des informations relatives à l'activité du parking.
-
-Il peut notamment :
-
-- consulter les statistiques ;
-- éditer les statistiques.
+**Relations de généralisation entre acteurs** (au sens du cours : *"le sous-acteur peut faire avec le système tout ce que peut faire l'acteur parent, et d'autres choses"*) :
+- `Abonné` est une sorte de `Client`.
+- `Super_Abonné` est une sorte de `Client`.
 
 ---
 
-# 4. Cas d'utilisation
+# 4. Diagramme de cas d'utilisation
 
-Les principaux cas d'utilisation du système sont :
-
-| Domaine | Cas d'utilisation | Acteur |
+| Paquetage | Cas d'utilisation | Acteur |
 |---|---|---|
 | CLIENT | Se garer | Client |
 | CLIENT | Reprendre la voiture | Client |
@@ -120,32 +78,32 @@ Les principaux cas d'utilisation du système sont :
 | ADMINISTRATION | Consulter les statistiques | Administrateur |
 | ADMINISTRATION | Éditer les statistiques | Administrateur |
 
+**Relations entre cas d'utilisation** (vocabulaire du cours : *Extension* — « B étend A, B est une partie optionnelle de A » ; *Utilisation* — « A inclut B, B est une partie obligatoire de A ») :
+- **Se désinscrire du pack garantie** \<\<extend\>\> **S'inscrire au pack garantie**
+- **S'abonner** \<\<extend\>\> **Se garer** (le client peut choisir de s'abonner pendant qu'il se gare)
+- **Reprendre la voiture** \<\<extend\>\> **Se garer** (au sens du diagramme fourni par l'enseignant : ce sont deux cas liés du même paquetage CLIENT)
+- **Effectuer la livraison** \<\<extend\>\> **Demander Livraison**
+- **Éditer les statistiques** \<\<extend\>\> **Consulter les statistiques**
+
 ---
 
 # 5. Fonctionnalité « Se garer »
 
-## 5.1 Acteur
+**Acteur** : Client
+**Objectif** : permettre à un client de garer son véhicule dans une place adaptée du parking.
 
-**Client**
+**Début du cas d'utilisation** (événement déclencheur) : le client arrive devant l'un des accès du parking.
+**Fin du cas d'utilisation** (événement d'arrêt) : le ticket est délivré et le véhicule est garé — ou le client est informé qu'aucune place n'est disponible.
 
-## 5.2 Objectif
+**Préconditions** :
+- le client se présente à l'un des accès ;
+- le véhicule peut être identifié par le système ;
+- le parking est disponible (instance unique du singleton `Parking`).
 
-Permettre à un client de garer son véhicule dans une place adaptée du parking.
-
-## 5.3 Préconditions
-
-- Le client se présente à l'un des accès.
-- Le véhicule peut être identifié par le système.
-- Le parking est disponible.
-
-## 5.4 Scénario nominal
-
+**Scénario nominal** :
 1. Le client arrive devant l'un des accès.
-2. La caméra récupère les informations du véhicule :
-   - immatriculation ;
-   - hauteur ;
-   - longueur.
-3. Le système détermine le statut du client.
+2. La caméra récupère les informations du véhicule : immatriculation, hauteur, longueur.
+3. Le système détermine le statut du client (Super_Abonné, Abonné, Client).
 4. Le parking recherche une place compatible avec le véhicule.
 5. Une place disponible est attribuée au véhicule.
 6. La borne effectue les opérations nécessaires concernant le ticket.
@@ -157,10 +115,9 @@ Permettre à un client de garer son véhicule dans une place adaptée du parking
 12. Le nombre de places disponibles est mis à jour.
 13. Le panneau d'affichage est actualisé.
 
-## 5.5 Cas particulier : aucune place disponible
+**Postconditions (succès)** : une place passe à l'état occupé, un `Placement` actif est créé, `Voiture.estDansParking = True`, ticket délivré, panneaux d'affichage à jour.
 
-Lorsque le parking ne possède aucune place adaptée au véhicule :
-
+**Scénario alternatif — aucune place disponible** :
 - aucune place n'est attribuée ;
 - le système informe le client qu'aucune place n'est disponible ;
 - le véhicule n'est pas garé dans le parking.
@@ -169,21 +126,17 @@ Lorsque le parking ne possède aucune place adaptée au véhicule :
 
 # 6. Fonctionnalité « Reprendre la voiture »
 
-## 6.1 Acteur
+**Acteur** : Client
+**Objectif** : permettre au client de récupérer son véhicule stationné dans le parking.
 
-**Client**
+**Début** : le client se présente à un accès avec son ticket.
+**Fin** : la place est libérée et le véhicule est rendu au client (ou pris en charge pour livraison/service).
 
-## 6.2 Objectif
+**Préconditions** :
+- le véhicule est présent dans le parking ;
+- le client possède le ticket correspondant.
 
-Permettre au client de récupérer son véhicule stationné dans le parking.
-
-## 6.3 Préconditions
-
-- Le véhicule est présent dans le parking.
-- Le client possède le ticket correspondant.
-
-## 6.4 Scénario nominal
-
+**Scénario nominal** :
 1. Le client se présente à l'un des accès.
 2. Il présente son ticket.
 3. Le système identifie le véhicule correspondant.
@@ -195,30 +148,18 @@ Permettre au client de récupérer son véhicule stationné dans le parking.
 9. Le panneau d'affichage est actualisé.
 10. Le véhicule est rendu au client.
 
-## 6.5 Cas particuliers
+**Postconditions** : `Placement` clôturé, place libérée, compteurs et panneaux à jour, `Voiture.estDansParking = False`.
 
-### Livraison
-
-Si le client a demandé une livraison, le système récupère le véhicule et organise sa livraison conformément à la demande.
-
-### Entretien ou maintenance
-
-Dans le cas d'une demande d'entretien ou de maintenance, le système prend en charge le véhicule et le gare à nouveau après la réalisation du service.
+**Scénarios alternatifs** :
+- **Livraison** : si le client a demandé une livraison, le système récupère le véhicule et organise sa livraison conformément à la demande, au lieu de le restituer physiquement.
+- **Entretien / maintenance** : le système prend en charge le véhicule et le gare à nouveau après la réalisation du service (nouveau `Placement`, sans nouvelle interaction avec le client).
 
 ---
 
 # 7. Fonctionnalité « S'abonner »
 
-## 7.1 Acteur
-
-**Client**
-
-## 7.2 Objectif
-
-Permettre à un client de souscrire à une formule d'abonnement proposée par le parking.
-
-## 7.3 Scénario
-
+**Acteur** : Client
+**Scénario** :
 1. Le client consulte les abonnements disponibles.
 2. Il sélectionne une formule.
 3. Le système enregistre son abonnement.
@@ -226,280 +167,249 @@ Permettre à un client de souscrire à une formule d'abonnement proposée par le
 5. Le client devient abonné.
 6. Il peut alors bénéficier des services associés à son abonnement.
 
----
+**Postcondition** : `Client.estAbonne = True`, `Contrat` actif créé.
 
 # 8. Fonctionnalité « Se désabonner »
 
-## 8.1 Acteur
-
-**Abonné**
-
-## 8.2 Objectif
-
-Permettre à un abonné de mettre fin à son abonnement.
-
-## 8.3 Scénario
-
+**Acteur** : Abonné
+**Scénario** :
 1. L'abonné demande la résiliation de son abonnement.
 2. Le système identifie le contrat correspondant.
 3. Le contrat est clôturé.
 4. Le statut du client est mis à jour.
 
----
-
 # 9. Fonctionnalité « Pack garantie »
 
-Le parking propose un pack garantissant au client une solution de stationnement.
+**Inscription** (Super_Abonné) : le client souscrit au pack garantie ; le parking lui réserve une place ; si aucune place n'est disponible dans le parking, le véhicule peut être stationné dans un autre parking, de façon transparente pour le client ; l'inscription donne également accès aux services réservés aux abonnés.
 
-## 9.1 Inscription au pack garantie
-
-Le client souscrit au pack garantie.
-
-Le parking réserve une place pour le client.
-
-Si aucune place n'est disponible dans le parking, le véhicule peut être stationné dans un autre parking.
-
-Cette opération doit être transparente pour le client.
-
-L'inscription au pack permet également de bénéficier des services proposés aux abonnés.
-
-## 9.2 Désinscription du pack garantie
-
-Le client peut demander la fin de son inscription au pack garantie.
-
-Le système met alors à jour les informations correspondant à son abonnement.
-
----
+**Désinscription** : le client met fin à son inscription ; le système met à jour son abonnement en conséquence.
 
 # 10. Fonctionnalité « Demander une maintenance »
 
-## 10.1 Acteur
-
-**Abonné**
-
-## 10.2 Scénario
-
-1. L'abonné demande une maintenance.
-2. Le système enregistre la demande.
-3. Le véhicule est pris en charge.
-4. La maintenance est réalisée.
-5. Les informations relatives au service sont enregistrées.
-6. Le véhicule est garé à nouveau après le service.
-
----
+**Acteur** : Abonné
+1. Demande de maintenance enregistrée.
+2. Véhicule pris en charge (cf. Reprendre la voiture).
+3. Maintenance réalisée, informations enregistrées (rapport).
+4. Véhicule garé à nouveau.
 
 # 11. Fonctionnalité « Demander un entretien »
 
-## 11.1 Acteur
-
-**Abonné**
-
-## 11.2 Scénario
-
-1. L'abonné demande un entretien.
-2. Le système enregistre la demande.
-3. Le véhicule est pris en charge.
-4. L'entretien est réalisé.
-5. Les informations relatives au service sont enregistrées.
-6. Le véhicule est garé à nouveau.
-
----
+**Acteur** : Abonné — même déroulé que la maintenance (étapes 1 à 4), appliqué à un entretien.
 
 # 12. Fonctionnalité « Demander une livraison »
 
-## 12.1 Acteur
-
-**Abonné**
-
-## 12.2 Informations nécessaires
-
-La demande de livraison comprend notamment :
-
-- une date ;
-- une heure ;
-- une adresse.
-
-## 12.3 Scénario
-
+**Acteur** : Abonné
+**Informations requises** : date, heure, adresse.
 1. L'abonné demande la livraison de son véhicule.
 2. Le système enregistre la demande.
 3. Le véhicule est récupéré.
 4. Un voiturier prend en charge la livraison.
 5. Le véhicule est livré à l'adresse et à l'heure demandées.
 
-Le sujet précise également que le parking propose une politique de flexibilité permettant au client de modifier ses options de service par simple appel téléphonique.
-
----
+Politique de flexibilité : le client peut modifier ses options de service par simple appel téléphonique avant l'exécution.
 
 # 13. Fonctionnalité « Effectuer la livraison »
 
-## 13.1 Acteur
+**Acteur** : Voiturier — prend en charge le véhicule et effectue la livraison conformément aux informations enregistrées dans la demande.
 
-**Voiturier**
+# 14. Fonctionnalité « Consulter / Éditer les statistiques »
 
-Le voiturier intervient pour réaliser une livraison demandée par un abonné.
-
-Il prend en charge le véhicule et effectue la livraison conformément aux informations enregistrées dans la demande.
+**Acteur** : Administrateur — le système conserve une trace des passages des véhicules (fréquentation, activité, usage des services). L'administrateur peut consulter cette activité et l'éditer sous différents formats : texte, HTML, image (plans), vidéo.
 
 ---
 
-# 14. Gestion des places
+# 15. Diagramme de classes — inventaire
 
-Le système doit gérer l'ensemble des places du parking.
+Notation reprise du cours (`+ public`, `# protégé`, `- privé`, `nom : Type`, `opération(arg : type) : TypeRetour`), sur la base du diagramme fourni par l'enseignant.
 
-Chaque place possède notamment :
+| Classe | Attributs (extrait) | Opérations principales |
+|---|---|---|
+| `Parking` *(singleton)* | `- nbPlacesParNiveau`, `- nbPlacesLibres`, `- prix`, `- nbNiveaux` | `+ rechercherPlace(v: Voiture): Place`, `+ nbPlacesLibresParNiveau(niveau: char): int`, `+ addAbonnement(ab: Abonnement)` |
+| `Place` | `+ numero: int`, `+ niveau: char`, `+ longueur: float`, `+ hauteur: float`, `+ estLibre: bool` | `+ addPlacementP(p: Placement)` |
+| `Voiture` | `+ immatriculation: string`, `+ hauteur: float`, `+ longueur: float`, `+ estDansParking: bool` | `+ addPlacementV(p: Placement)` |
+| `Placement` | `+ dateDebut: Date`, `+ dateFin: Date`, `+ estEnCours: bool` | `+ partirPlace()` |
+| `Client` | `+ nom: string`, `+ adresse: string`, `+ estAbonne: bool`, `+ estSuperAbonne: bool`, `+ nbFrequentations: int` | `+ sAbonner(ab: Abonnement)`, `+ nouvelleVoiture(imma, hautV, longV)`, `+ seDesabonner()`, `+ demanderMaintenance()`, `+ demanderEntretien()`, `+ demanderLivraison(dateL, heure, adresseL)`, `+ entrerParking(a: Acces): string` |
+| `Abonnement` | `+ libelle: string`, `+ prix: float`, `+ estPackGar: bool` | `+ addContrat(contrat: Contrat)` |
+| `Contrat` | `+ dateDebut: Date`, `+ dateFin: Date`, `+ estEnCours: bool` | `+ rompreContrat()` |
+| `Service` *(mère de Maintenance/Entretien/Livraison)* | `+ dateDemande: Date`, `+ dateService: Date`, `+ rapport: string` | — |
+| `Maintenance` | — | `+ effectuerMaintenance(v: Voiture)` |
+| `Entretien` | — | `+ effectuerEntretien()` |
+| `Livraison` | — | `+ effectuerLivraison()` |
+| `Voiturier` | `+ numVoiturier: int` | `+ livrerVoiture(v: Voiture, date: Date, heure: int)` |
+| `Acces` | — | `+ actionnerCamera(c: Client): Voiture`, `+ actionnerPanneau()`, `+ lancerProcedureEntree(c: Client): string` |
+| `Camera` | — | `+ capturerHauteur(v): float`, `+ capturerLongueur(v): float`, `+ capturerImmat(v): string` |
+| `BorneTicket` | — | `+ delivrerTicket(c): string`, `+ proposerServices()`, `+ proposerAbonnements(c, p)`, `+ proposerTypePaiement()` |
+| `PanneauAffichage` | — | `+ afficherNbPlacesDisponibles(p: Parking): string` |
+| `Teleporteur` | — | `+ teleporterVoiture(v, p): Placement`, `+ teleporterVoitureSuperAbonne(v): string` |
 
-- un identifiant unique ;
-- un numéro ;
-- un niveau ;
-- une longueur ;
-- une hauteur ;
-- un état indiquant si elle est libre ou occupée.
-
-Lorsqu'un véhicule entre :
-
-- une place compatible est recherchée ;
-- la place est attribuée ;
-- elle devient occupée.
-
-Lorsqu'un véhicule sort :
-
-- la place est libérée ;
-- elle redevient disponible.
-
----
-
-# 15. Gestion des véhicules
-
-Le système doit conserver les informations nécessaires à l'identification des véhicules.
-
-Une voiture possède notamment :
-
-- une immatriculation ;
-- une hauteur ;
-- une longueur ;
-- un état indiquant si elle se trouve dans le parking.
-
-Une voiture peut être associée à un placement correspondant à son stationnement.
+> ⚠️ **Point ouvert à trancher/justifier** : la classe `Statistiques` proposée par Ayachi dans une version antérieure n'apparaît pas dans le diagramme de classes fourni par l'enseignant. Le sujet impose de justifier toute modification des artefacts fournis (consigne « Méthode de travail »). À décider en binôme : l'ajouter et la justifier dans le rapport, ou la retirer et modéliser les statistiques comme un comportement de `Parking`/`Administrateur`. On va justifier ça plutart.
 
 ---
 
-# 16. Gestion des accès
+# 16. Règles fonctionnelles (RF)
 
-Le parking possède deux accès.
-
-Chaque accès comprend :
-
-- une caméra ;
-- une borne à tickets-paiement ;
-- un panneau d'affichage ;
-- deux téléporteurs.
-
-L'accès permet notamment de gérer l'entrée et la sortie des véhicules.
-
----
-
-# 17. Gestion des tickets et du paiement
-
-Lorsqu'une place est attribuée à un véhicule, la borne délivre un ticket.
-
-Le ticket permet notamment d'actionner le système nécessaire à la récupération ou au stationnement du véhicule.
-
-Lors de l'entrée, le système peut également déterminer :
-
-- si le client possède un abonnement ;
-- si une carte d'abonnement est nécessaire ;
-- le mode de paiement utilisé.
-
-Le sujet prévoit notamment le paiement en espèces ou par carte bancaire.
+| # | Règle |
+|---|---|
+| **RF01** | Le système doit pouvoir récupérer l'immatriculation, la hauteur et la longueur du véhicule à l'aide de la caméra. |
+| **RF02** | Le système doit attribuer une place compatible avec les dimensions du véhicule lorsqu'une place est disponible. |
+| **RF03** | Lorsqu'aucune place adaptée n'est disponible, le système ne doit pas effectuer le stationnement normal du véhicule. |
+| **RF04** | L'entrée ou la sortie d'une voiture doit entraîner la mise à jour du nombre de places disponibles. |
+| **RF05** | Lorsqu'une place est attribuée, le système doit permettre la délivrance d'un ticket. |
+| **RF06** | Les abonnés doivent pouvoir bénéficier des services prévus par leur abonnement. |
+| **RF07** | Le pack garantie doit permettre de garantir une solution de stationnement au client, éventuellement dans un autre parking. |
+| **RF08** | Le système doit permettre de demander et d'effectuer la livraison d'un véhicule. |
+| **RF09** | Le système doit conserver des informations permettant d'étudier la fréquentation du parking. |
+| **RF10** | L'administrateur doit pouvoir consulter et éditer les statistiques. |
 
 ---
 
-# 18. Gestion des panneaux d'affichage
+# 17. Spécification des tests unitaires par classe
 
-Un panneau est situé au niveau de chacun des accès.
+Conformément au « Travail à réaliser » du sujet (identifier puis spécifier les tests unitaires de chaque classe, sans implémentation à ce stade). Pour chaque méthode : **cas nominal**, **cas limite**, **cas d'erreur**, avec traçabilité vers les RF ci-dessus.
 
-Il indique le nombre de places disponibles.
+## 17.1 `Place`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Affectation à un véhicule compatible | Nominal | Place disponible → occupée | RF02 |
+| Affectation à un véhicule incompatible (hauteur/longueur) | Erreur | Refus de l'affectation | RF02 |
+| Affectation sur une place déjà occupée | Erreur | Refus / exception (à définir) | RF02, RF03 |
+| Libération après récupération | Nominal | Place repasse à disponible | RF04 |
+| Libération d'une place déjà disponible | Limite | Comportement idempotent à définir | RF04 |
 
-Lorsqu'une voiture entre :
+## 17.2 `Voiture`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Association à un `Placement` | Nominal | `estDansParking = True` | — |
+| Association alors que la voiture est déjà dans le parking | Erreur | Refus | RF03 |
+| Sortie du parking | Nominal | `estDansParking = False` | RF04 |
 
-**nombre de places disponibles → diminution**
+## 17.3 `Placement`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Fin d'un placement en cours | Nominal | `estEnCours = False`, `dateFin` renseignée, place libérée | RF04 |
+| Fin d'un placement déjà terminé | Limite | Comportement idempotent à définir | RF04 |
 
-Lorsqu'une voiture sort :
+## 17.4 `Client`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Recherche de place pour un client non abonné | Nominal | Place compatible proposée si disponible | RF02 |
+| Recherche de place, parking plein / aucune place compatible | Erreur | Indication explicite "aucune place" | RF03 |
+| Accès à un service abonné par un client non abonné | Erreur | Accès refusé | RF06 |
+| Accès à un service abonné par un abonné | Nominal | Service accepté | RF06 |
+| Souscription d'un abonnement | Nominal | Statut client mis à jour (abonné/super-abonné) | RF06, RF07 |
+| Ajout d'un nouveau véhicule | Nominal | Véhicule correctement rattaché | — |
 
-**nombre de places disponibles → augmentation**
+## 17.5 `Contrat` / `Abonnement`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Souscription | Nominal | Contrat actif créé | RF06 |
+| Résiliation d'un contrat actif | Nominal | `estEnCours = False`, `dateFin` renseignée | RF06 |
+| Résiliation d'un contrat déjà résilié | Limite | Comportement idempotent à définir | — |
+| Accès service sans contrat actif | Erreur | Accès refusé | RF06 |
 
-Les panneaux doivent être actualisés en conséquence.
+## 17.6 `Service` / `Maintenance` / `Entretien` / `Livraison`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Création d'une demande de service | Nominal | `dateDemande` horodatée | — |
+| Exécution (maintenance/entretien) | Nominal | Véhicule repris, service effectué, regaré, rapport renseigné | RF06 |
+| Demande de livraison avec date/heure/adresse | Nominal | Livraison programmée correctement | RF08 |
+| Modification des options avant exécution | Nominal | Nouvelle adresse/heure prise en compte | RF08 |
+| Demande de service par un client non abonné | Erreur | Refus | RF06 |
+
+## 17.7 `Voiturier`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Livraison suite à une demande existante | Nominal | Véhicule livré à l'adresse/heure attendues | RF08 |
+| Tentative de livraison sans demande préalable | Erreur | Refus | RF08 |
+
+## 17.8 `Camera`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Capture des infos véhicule | Nominal | Immat/hauteur/longueur cohérentes | RF01 |
+| Capture avec infos incomplètes | Erreur | Comportement à définir | RF01 |
+
+## 17.9 `BorneTicket`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Délivrance après affectation de place | Nominal | Ticket valide retourné | RF05 |
+| Délivrance sans place affectée | Erreur | Aucun ticket délivré | RF03, RF05 |
+| Proposition de services (abonné vs non-abonné) | Nominal | Liste différente selon statut | RF06 |
+| Récupération du mode de paiement | Nominal | Valeur cohérente (CB/espèces) | — |
+
+## 17.10 `Teleporteur`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Déplacement vers une place assignée | Nominal | `Placement` créé, bonne place associée | — |
+| Déplacement pour un super-abonné (pack garanti) | Nominal | Chemin dédié, sans recherche de place classique | RF07 |
+| Retour d'un véhicule à la sortie | Nominal | Place libérée | RF04 |
+
+## 17.11 `PanneauAffichage`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Affichage du nombre de places disponibles | Nominal | Valeur = places libres à l'instant T | RF04 |
+| Mise à jour après entrée/sortie | Nominal | Compteur décrémenté/incrémenté | RF04 |
+| Affichage parking plein | Limite | Valeur = 0, cohérent avec RF03 | RF03, RF04 |
+
+## 17.12 `Acces`
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Procédure d'entrée complète (test d'intégration au niveau classe) | Nominal | Séquence correcte, ticket délivré, véhicule placé | RF01, RF02, RF05 |
+| Procédure d'entrée, parking plein | Erreur | Message d'absence de place, aucun ticket | RF03 |
+
+## 17.13 `Parking` *(singleton)*
+| Cas testé | Type | Résultat attendu | RF |
+|---|---|---|---|
+| Instanciation multiple | Nominal | Une seule instance (test du patron singleton) | — |
+| Recherche de place compatible | Nominal | Place trouvée si elle existe | RF02 |
+| Recherche de place, aucune compatible | Erreur | Indication "aucune place" | RF03 |
+| Comptage de places libres par niveau | Nominal | Valeur exacte | — |
+| Mise à jour globale après entrée/sortie | Nominal | Compteur cohérent avec la somme des places | RF04 |
+
+### Synthèse de couverture
+
+| RF | Classes testées |
+|---|---|
+| RF01 | `Camera`, `Acces` |
+| RF02 | `Place`, `Client`, `Parking`, `Acces` |
+| RF03 | `Place`, `Client`, `Parking`, `BorneTicket`, `Acces`, `PanneauAffichage` |
+| RF04 | `Place`, `Voiture`, `Placement`, `Teleporteur`, `PanneauAffichage`, `Parking` |
+| RF05 | `BorneTicket`, `Acces` |
+| RF06 | `Client`, `Contrat`/`Abonnement`, `Service` |
+| RF07 | `Client`, `Teleporteur` |
+| RF08 | `Service`/`Livraison`, `Voiturier` |
+| RF09 | non couvert explicitement — dépend de la résolution du point ouvert sur la classe `Statistiques` (§15) |
+| RF10 | non couvert explicitement — idem, dépend de la classe portant les statistiques |
 
 ---
 
-# 19. Gestion des statistiques
+# 18. Choix de conception retenus
 
-Le système conserve une trace des passages des véhicules.
+Points soulevés à la relecture de la Partie 0, tranchés en binôme avant d'attaquer la Partie 1. Le principe directeur retenu : **rester au plus près du modèle fourni par l'enseignant** plutôt que d'ajouter des éléments qui devraient ensuite être justifiés — conformément à la consigne « Méthode de travail » du sujet (*"toute modification apportée aux artefacts issus de la modélisation proposés est à justifier"*).
 
-Ces informations permettent notamment d'étudier :
+### 18.1 Retour de `rechercherPlace` quand le parking est plein
 
-- la fréquentation du parking ;
-- l'activité du parking ;
-- l'utilisation des différents services.
+**Décision : retourner `None`.**
+Le sujet précise lui-même : *"Si le parking est plein, une valeur particulière est retournée."* Un parking plein est un état métier normal (pas une erreur de programmation) — l'exception Python reste réservée aux violations de contrat internes. `None` est la valeur idiomatique en Python pour "pas de résultat".
 
-L'administrateur peut consulter ces statistiques et éditer l'activité du parking.
+### 18.2 Héritage `Client → Abonné → Super_Abonné`
 
-Le sujet indique que les statistiques peuvent être présentées sous différentes formes, notamment :
+**Décision : ne pas créer de sous-classes ; une seule classe `Client`, statut géré par `estAbonne` et `estSuperAbonne`.**
+Le diagramme de classes fourni ne définit qu'une seule classe `CLIENT` avec ces deux booléens. La hiérarchie Client/Abonné/Super_Abonné n'existe que côté acteurs UML (diagramme de cas d'utilisation), pas côté classes. Créer trois classes distinctes reviendrait à modifier le modèle fourni sans nécessité — on reste donc fidèle au diagramme donné.
 
-- documents texte ;
-- HTML ;
-- images pour les plans ;
-- vidéo.
+### 18.3 Classe `Statistiques`
 
----
+**Décision : la retirer.** Les statistiques sont modélisées comme un comportement porté par `Parking` (conservation de la trace de passage) et consulté/édité via l'acteur `Administrateur`, conformément au modèle fourni. Cela évite d'introduire une classe absente du diagramme de l'énoncé et la justification qu'elle exigerait.
 
-# 20. Règles fonctionnelles principales
+### 18.4 Format de persistance des données
 
-Les principales règles fonctionnelles du système sont les suivantes :
+**Décision : reporté à la Partie 3.** La consigne du sujet classe explicitement ce point en 3.2 ("Gestion de la persistance"), pas en Partie 0 — pas de blocage à ce stade.
 
-### RF01 — Identification du véhicule
+### 18.5 Politique de gestion des erreurs
 
-Le système doit pouvoir récupérer l'immatriculation, la hauteur et la longueur du véhicule à l'aide de la caméra.
+**Décision : une règle unique appliquée à toutes les classes.**
+- **Résultat métier attendu** (parking plein, pas d'abonnement actif, contrat déjà résilié) → valeur de retour spéciale (`None`, `False`).
+- **Violation d'un contrat / état incohérent** (téléporteur actionné sans demande de livraison, place déjà occupée réaffectée) → exception Python personnalisée.
 
-### RF02 — Attribution d'une place
+### 18.6 Rôle du `Voiturier` dans « Se garer »
 
-Le système doit attribuer une place compatible avec les dimensions du véhicule lorsqu'une place est disponible.
-
-### RF03 — Parking complet
-
-Lorsqu'aucune place adaptée n'est disponible, le système ne doit pas effectuer le stationnement normal du véhicule.
-
-### RF04 — Mise à jour des places
-
-L'entrée ou la sortie d'une voiture doit entraîner la mise à jour du nombre de places disponibles.
-
-### RF05 — Ticket
-
-Lorsqu'une place est attribuée, le système doit permettre la délivrance d'un ticket.
-
-### RF06 — Services abonnés
-
-Les abonnés doivent pouvoir bénéficier des services prévus par leur abonnement.
-
-### RF07 — Pack garantie
-
-Le pack garantie doit permettre de garantir une solution de stationnement au client, éventuellement dans un autre parking.
-
-### RF08 — Livraison
-
-Le système doit permettre de demander et d'effectuer la livraison d'un véhicule.
-
-### RF09 — Statistiques
-
-Le système doit conserver des informations permettant d'étudier la fréquentation du parking.
-
-### RF10 — Administration
-
-L'administrateur doit pouvoir consulter et éditer les statistiques.
-
----
-
-# 21. Limites de cette spécification
-
-Cette partie décrit le **
+**Décision : rien à modifier.** L'énoncé porte l'annotation *"Nous n'avons pas fait la classe Voiturier pour l'UC garer la voiture"* — c'est un choix assumé par l'enseignant dans le modèle fourni, pas un oubli à corriger.
