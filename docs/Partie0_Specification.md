@@ -176,7 +176,7 @@ Le cours distingue quatre catégories d'acteurs : **acteurs principaux** (utilis
 1. L'abonné demande la résiliation de son abonnement.
 2. Le système identifie le contrat correspondant.
 3. Le contrat est clôturé.
-4. Le statut du client est mis à jour.
+4. Le statut du client est mis à jour.  
 
 # 9. Fonctionnalité « Pack garantie »
 
