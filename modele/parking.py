@@ -225,3 +225,51 @@ class Place:
         self.__estLibre = True
 
 
+class Placement:
+    """
+    Classe-association entre une Voiture et une Place : un passage dans le parking.
+
+    Les placements terminés sont conservés et servent de trace pour les statistiques.
+    """
+
+    def __init__(self, voiture, place):
+        """
+        Crée un placement en cours, daté de maintenant, et gare la voiture.
+
+        :param voiture: la voiture garée (Voiture)
+        :param place: la place occupée (Place)
+        :raises VoitureDejaGareeError: si la voiture est déjà dans le parking
+        :raises PlaceOccupeeError: si la place est déjà occupée
+        :raises PlaceIncompatibleError: si la voiture est trop grande pour la place
+        """
+        if voiture.estDansParking:
+            raise VoitureDejaGareeError(f"La voiture {voiture.immatriculation} est déjà garée")
+        self.voiture = voiture
+        self.place = place
+        self.dateDebut = datetime.now()
+        self.dateFin = None
+        place.addPlacementP(self)    # vérifie la place en premier
+        voiture.addPlacementV(self)  # puis la voiture entre dans le parking
+
+    @property
+    def estEnCours(self):
+        """
+        Attribut dérivé : vrai tant que dateFin n'est pas renseignée.
+
+        :return: un booléen
+        """
+        return self.dateFin is None
+
+    def partirPlace(self):
+        """
+        Termine le placement : renseigne dateFin, libère la place et sort la voiture.
+
+        :return: True si le placement a été terminé, False s'il l'était déjà
+        """
+        if not self.estEnCours:
+            return False
+        self.dateFin = datetime.now()
+        self.place.liberer()
+        self.voiture.estDansParking = False
+        self.voiture.lieuStationnement = None
+        return True
