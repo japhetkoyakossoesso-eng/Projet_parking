@@ -93,3 +93,40 @@ class Parking:
         :return: un entier
         """
         return sum(1 for place in self.__places.values() if place.estLibre)
+
+    def rechercherPlace(self, v):
+        """
+        Cherche une place libre assez grande pour la voiture v.
+
+        Une place convient si elle est libre et si sa hauteur et sa longueur
+        sont supérieures ou égales à celles de la voiture.
+
+        :param v: la voiture à garer (Voiture)
+        :return: la place trouvée (Place), ou None si aucune ne convient
+        """
+        for place in self.__places.values():
+            if place.estLibre and place.estCompatible(v):
+                return place
+        return None
+    
+    def nbPlacesLibresParNiveau(self, niveau):
+        """
+        Compte les places libres d'un niveau.
+
+        :param niveau: la lettre du niveau, par exemple 'A'
+        :return: le nombre de places libres (int)
+        :raises ValueError: si le niveau n'existe pas
+        """
+        if niveau not in self.niveaux():
+            raise ValueError(f"Le niveau {niveau} n'existe pas")
+        return sum(1 for place in self.__places.values()
+                   if place.niveau == niveau and place.estLibre)
+
+    def addAbonnement(self, ab):
+        """
+        Ajoute une formule d'abonnement proposée par le parking (sans doublon).
+
+        :param ab: l'abonnement à ajouter (Abonnement)
+        """
+        if ab not in self.mesAbonnements:
+            self.mesAbonnements.append(ab)
