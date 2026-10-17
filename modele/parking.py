@@ -130,3 +130,98 @@ class Parking:
         """
         if ab not in self.mesAbonnements:
             self.mesAbonnements.append(ab)
+
+    def historiquePassages(self):
+        """
+        Renvoie tous les placements, terminés ou en cours (trace de passage).
+
+        Ajout au diagramme fourni, justifié par RF09 et RF10 (statistiques).
+
+        :return: une liste de Placement
+        """
+        historique = []
+        for place in self.__places.values():
+            historique.extend(place.mesPlacements)
+        return historique
+
+
+class Place:
+    """Une place du parking, identifiée par son niveau et son numéro."""
+
+    def __init__(self, numero, niveau, longueur, hauteur):
+        """
+        Crée une place libre.
+
+        :param numero: numéro de la place dans son niveau (int)
+        :param niveau: lettre du niveau (str d'un caractère)
+        :param longueur: longueur de la place en mètres (float)
+        :param hauteur: hauteur de la place en mètres (float)
+        :raises ValueError: si une dimension est négative ou nulle
+        """
+        if longueur <= 0 or hauteur <= 0:
+            raise ValueError("Les dimensions d'une place doivent être positives")
+        self.numero = numero        # + public
+        self.__niveau = niveau      # - privé
+        self.__longueur = longueur
+        self.__hauteur = hauteur
+        self.__estLibre = True
+        self.mesPlacements = []     # tous les placements passés et en cours
+
+    @property
+    def niveau(self):
+        return self.__niveau
+
+    @property
+    def longueur(self):
+        return self.__longueur
+
+    @property
+    def hauteur(self):
+        return self.__hauteur
+
+    @property
+    def estLibre(self):
+        
+        return self.__estLibre
+
+    @property
+    def idPlace(self): 
+        
+        
+        
+        """
+        Identifiant unique de la place : niveau + numéro, par exemple « A1 ».
+
+        :return: une chaîne
+        """
+        return f"{self.__niveau}{self.numero}"
+
+    def estCompatible(self, v):
+        """
+        Vérifie que la voiture v tient dans la place (dimensions égales acceptées).
+
+        :param v: la voiture (Voiture)
+        :return: True si la voiture tient, False sinon
+        """
+        return v.hauteur <= self.__hauteur and v.longueur <= self.__longueur
+
+    def addPlacementP(self, p):
+        """
+        Associe un placement à la place, qui devient occupée.
+
+        :param p: le placement (Placement)
+        :raises PlaceOccupeeError: si la place est déjà occupée
+        :raises PlaceIncompatibleError: si la voiture est trop grande pour la place
+        """
+        if not self.__estLibre:
+            raise PlaceOccupeeError(f"La place {self.idPlace} est déjà occupée")
+        if not self.estCompatible(p.voiture):
+            raise PlaceIncompatibleError(f"La voiture ne tient pas dans la place {self.idPlace}")
+        self.mesPlacements.append(p)
+        self.__estLibre = False
+
+    def liberer(self):
+        """Rend la place libre. Appelée par Placement.partirPlace()."""
+        self.__estLibre = True
+
+
