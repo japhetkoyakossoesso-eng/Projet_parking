@@ -15,7 +15,7 @@ class Parking:
     (niveau + numéro, par exemple « A1 »), et des abonnements qu'il propose.
     """
 
-    prix = 0  # attribut de classe qui appartient à la classe elle-même et n’est pas créé individuellement dans chaque appel à __init__.(souligné dans le diagramme)
+    prix = 0  # attribut de classe (souligné dans le diagramme)
 
     _instance = None  # l'instance unique du singleton
 
@@ -27,7 +27,7 @@ class Parking:
             cls._instance = super().__new__(cls)
             cls._instance._initialise = False
         return cls._instance
-    
+
     def __init__(self, nbNiveaux=1, nbPlacesParNiveau=0):
         """
         Crée le parking. Les appels suivants à Parking() ne changent rien.
@@ -41,6 +41,7 @@ class Parking:
         self.__nbPlacesParNiveau = nbPlacesParNiveau  # - privé
         self.__places = {}                            # idPlace -> Place
         self.mesAbonnements = []
+        self.mesVoituriers = []
         self._initialise = True
 
     @classmethod
@@ -108,7 +109,7 @@ class Parking:
             if place.estLibre and place.estCompatible(v):
                 return place
         return None
-    
+
     def nbPlacesLibresParNiveau(self, niveau):
         """
         Compte les places libres d'un niveau.
@@ -130,6 +131,17 @@ class Parking:
         """
         if ab not in self.mesAbonnements:
             self.mesAbonnements.append(ab)
+
+    def voiturierDisponible(self):
+        """
+        Renvoie un voiturier pour une livraison (en crée un s'il n'y en a aucun).
+
+        :return: un Voiturier
+        """
+        if not self.mesVoituriers:
+            from modele.services import Voiturier
+            self.mesVoituriers.append(Voiturier(1))
+        return self.mesVoituriers[0]
 
     def historiquePassages(self):
         """
@@ -181,14 +193,10 @@ class Place:
 
     @property
     def estLibre(self):
-        
         return self.__estLibre
 
     @property
-    def idPlace(self): 
-        
-        
-        
+    def idPlace(self):
         """
         Identifiant unique de la place : niveau + numéro, par exemple « A1 ».
 
