@@ -1,1 +1,3 @@
 """Tests unitaires et d'intégration du projet DreamPark."""
+
+__version__ = '1.0.0'
