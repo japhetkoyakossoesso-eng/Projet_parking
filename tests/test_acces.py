@@ -50,19 +50,14 @@ class TestAcces(unittest.TestCase):
         self.borne.delivrerTicket.return_value = "A1-AB123CD-0930"
         self.borne.recupererInfosCarte.return_value = ""
 
-        # Création de l'accès sans imposer un constructeur
-        # qui n'est pas précisé dans le diagramme.
-        self.acces = Acces.__new__(Acces)
+        # Création de l'accès, puis remplacement de son matériel par des simulations
+        self.acces = Acces(self.parking)
 
-        # Composants associés à l'accès
-        self.acces.camera = self.camera
-        self.acces.borneTicket = self.borne
-        self.acces.panneauAffichage = self.panneau
-        self.acces.TelEntree = self.teleporteur_entree
-        self.acces.TelSortie = self.teleporteur_sortie
-
-        # Parking associé à l'accès
-        self.acces.parking = self.parking
+        self.acces.maCamera = self.camera
+        self.acces.maBorne = self.borne
+        self.acces.monPanneau = self.panneau
+        self.acces.telEntree = self.teleporteur_entree
+        self.acces.telSortie = self.teleporteur_sortie
 
         self.client = Mock()
         self.client.maVoiture = Voiture(
@@ -126,7 +121,7 @@ class TestAcces(unittest.TestCase):
         self.place3 = Place(3, "A", 1.00, 1.00)
 
         # Remplacement des places du parking
-        self.parking = Parking._reinitialiser()
+        Parking._reinitialiser()
         self.parking = Parking(
             nbNiveaux=1,
             nbPlacesParNiveau=0
@@ -136,7 +131,7 @@ class TestAcces(unittest.TestCase):
         self.parking.ajouterPlace(self.place2)
         self.parking.ajouterPlace(self.place3)
 
-        self.acces.parking = self.parking
+        self.acces.monParking = self.parking
 
         resultat = self.acces.lancerProcedureEntree(self.client)
 
@@ -187,7 +182,7 @@ class TestAcces(unittest.TestCase):
         self.parking.ajouterPlace(self.place2)
         self.parking.ajouterPlace(self.place3)
 
-        self.acces.parking = self.parking
+        self.acces.monParking = self.parking
 
         resultat = self.acces.lancerProcedureEntree(self.client)
 

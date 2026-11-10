@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import Mock
 
-from modele.camera import Camera
+from modele.acces import Camera
 
 
 class TestCamera(unittest.TestCase):

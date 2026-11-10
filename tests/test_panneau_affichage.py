@@ -3,7 +3,7 @@ import unittest
 
 from modele.parking import Parking, Place, Placement
 from modele.client import Voiture
-from modele.panneau_affichage import PanneauAffichage
+from modele.acces import PanneauAffichage
 
 
 class TestPanneauAffichage(unittest.TestCase):

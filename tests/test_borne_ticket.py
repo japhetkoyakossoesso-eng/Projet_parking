@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import Mock
 
-from modele.borne_ticket import BorneTicket
+from modele.acces import BorneTicket
 
 
 class TestBorneTicket(unittest.TestCase):
@@ -13,6 +13,7 @@ class TestBorneTicket(unittest.TestCase):
 
         self.client = Mock()
         self.client.estSuperAbonne = False
+        self.client.estAbonne = False
 
         self.client.maVoiture.immatriculation = "AB-123-CD"
         self.client.maVoiture.lieuStationnement = "A1"
@@ -57,7 +58,8 @@ class TestBorneTicket(unittest.TestCase):
         ticket = self.borne.delivrerTicket(self.client)
 
         self.assertIn("A1", ticket)
-        self.assertIn("AB-123-CD", ticket)
+        # Le ticket contient l'immatriculation sans tirets (choix de la Partie 0)
+        self.assertIn("AB123CD", ticket)
 
     def test_recuperer_infos_super_abonne(self):
         self.client.estSuperAbonne = True

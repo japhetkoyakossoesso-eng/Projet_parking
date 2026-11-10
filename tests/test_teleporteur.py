@@ -1,7 +1,7 @@
 
 import unittest
 
-from modele.teleporteur import Teleporteur
+from modele.acces import Teleporteur
 from modele.parking import Parking, Place
 from modele.client import Voiture
 
@@ -95,24 +95,12 @@ class TestTeleporteur(unittest.TestCase):
         voiture2 = Voiture("CD-456-EF", 1.80, 4.50)
         voiture3 = Voiture("GH-789-IJ", 1.80, 4.50)
 
-        self.place1.addPlacementP(
-            __import__("modele.parking", fromlist=["Placement"])
-            .Placement(voiture2, self.place1)
-        )
+        from modele.parking import Placement
 
-        self.place2.addPlacementP(
-            __import__("modele.parking", fromlist=["Placement"])
-            .Placement(voiture3, self.place2)
-        )
-
+        Placement(voiture2, self.place1)
+        Placement(voiture3, self.place2)
         # A3 est trop petite pour la voiture de test.
-        self.place3.addPlacementP(
-            __import__("modele.parking", fromlist=["Placement"])
-            .Placement(
-                Voiture("KL-012-MN", 1.50, 3.50),
-                self.place3
-            )
-        )
+        Placement(Voiture("KL-012-MN", 1.50, 3.50), self.place3)
 
         self.teleporteur.teleporterVoitureSuperAbonne(
             self.voiture
