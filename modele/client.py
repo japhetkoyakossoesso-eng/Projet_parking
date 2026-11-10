@@ -56,3 +56,60 @@ class Voiture:
         self.lieuStationnement = p.place.idPlace
 
 
+class Abonnement:
+    """Une formule d'abonnement proposée par le parking."""
+
+    def __init__(self, libelle, prix, estPackGar):
+        """
+        Crée une formule d'abonnement.
+
+        :param libelle: nom de la formule (str)
+        :param prix: prix (float)
+        :param estPackGar: vrai si la formule est un pack garantie (bool)
+        """
+        self.libelle = libelle
+        self.prix = prix
+        self.estPackGar = estPackGar
+        self.mesContrats = []
+
+    def addContrat(self, contrat):
+        """
+        Rattache un contrat à cette formule.
+
+        :param contrat: le contrat (Contrat)
+        """
+        if contrat not in self.mesContrats:
+            self.mesContrats.append(contrat)
+
+
+class Contrat:
+    """Classe-association entre un Client et un Abonnement."""
+
+    def __init__(self, client, abonnement):
+        """
+        Crée un contrat en cours, daté de maintenant.
+
+        :param client: le client (Client)
+        :param abonnement: la formule (Abonnement)
+        """
+        self.client = client
+        self.abonnement = abonnement
+        self.dateDebut = datetime.now()
+        self.dateFin = None
+        abonnement.addContrat(self)
+
+    @property
+    def estEnCours(self):
+        """Attribut dérivé : vrai tant que dateFin n'est pas renseignée."""
+        return self.dateFin is None
+
+    def rompreContrat(self):
+        """
+        Rompt le contrat en renseignant dateFin.
+
+        :return: True si le contrat a été rompu, False s'il l'était déjà
+        """
+        if not self.estEnCours:
+            return False
+        self.dateFin = datetime.now()
+        return True
