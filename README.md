@@ -1,6 +1,3 @@
-# Nom de l'équipe :  404 Places Not Found 
-# Membres de l'équipe : KOYAKOSSO-ESSO Japhet et Mohamed-Ramzi Ayachi
-
 # Projet_parking : DreamPark
 
 Système de gestion du parking automatisé DreamPark, réalisé en Python dans le cadre de la L3 MIASHS (parcours Informatique et SHS) à l'Université Toulouse 2 Jean-Jaurès.
@@ -122,6 +119,15 @@ Depuis le dossier `Projet_parking` :
 python3 main.py
 ```
 
+Le menu console (Partie 1) permet de :
+1. créer un client et sa voiture ;
+2. se garer par l'accès 1 ou 2 (ticket, paiement, abonnement proposé à la borne) ;
+3. s'abonner (formule « Mensuel » ou « Pack garantie ») ;
+4. voir l'état du parking (panneau et places) ;
+5. voir les clients, leur statut et où est leur voiture.
+
+Le parking de démonstration a 2 niveaux (A et B) de 5 places de tailles différentes. Les places A5 et B5 sont les seules assez grandes pour une voiture de 2.40 m x 5.90 m : c'est pratique pour tester le parking plein et le parking partenaire.
+
 ---
 
 ## 5. Lancer les tests
@@ -138,7 +144,7 @@ python3 -m unittest tests.test_parking -v
 
 Un seul test :
 ```bash
-python3 -m unittest tests.test_parking.TestParking.test_singleton
+python3 -m unittest tests.test_parking.TestParking.test_parking_est_un_singleton
 ```
 
 Mesurer la couverture des tests (si `coverage` est installé) :
@@ -147,7 +153,7 @@ coverage run -m unittest discover tests
 coverage report -m
 ```
 
-Sur la branche `partie0`, les tests sont seulement spécifiés (docstrings) et marqués `@unittest.skip` : la commande affiche donc « OK (skipped=85) ». Ils seront écrits à partir de la Partie 1.
+Sur la branche `partie1`, la commande affiche « OK (skipped=32) » : les tests du use case « Se garer » passent, et les 32 tests de `test_client.py` et `test_services.py` restent en pause (`@unittest.skip`) pour la Partie 2.
 
 Pensez à relancer tous les tests avant chaque commit, pour vérifier qu'une modification n'a rien cassé.
 
@@ -181,7 +187,8 @@ Projet_parking/
 ├── main.py                # point d'entrée de l'application
 ├── README.md
 ├── docs/
-│   └── Partie0_Specification.md
+│   ├── Partie0_Specification.md
+│   └── Partie1_Rapport.md
 ├── modele/                # classes métier
 │   ├── __init__.py
 │   ├── parking.py         # Parking, Place, Placement
@@ -190,20 +197,30 @@ Projet_parking/
 │   ├── acces.py           # Acces, Camera, BorneTicket, PanneauAffichage, Teleporteur
 │   └── exceptions.py      # PlaceOccupeeError, PlaceIncompatibleError...
 ├── vue/                   # affichage console puis interface tkinter
-│   └── __init__.py
+│   ├── __init__.py
+│   └── vue_console.py     # VueConsole : menus et saisies au clavier
 ├── controleur/            # lien entre la vue et le modèle
-│   └── __init__.py
+│   ├── __init__.py
+│   └── controleur_parking.py  # ControleurParking : parking de démonstration, actions du menu
 ├── persistance/           # sauvegarde et chargement des données
 │   └── __init__.py
 └── tests/                 # tests unittest
     ├── __init__.py
-    ├── test_parking.py    # TestParking, TestPlace, TestPlacement
-    ├── test_client.py     # TestClient, TestVoiture, TestAbonnement, TestContrat
-    ├── test_services.py   # TestMaintenance, TestEntretien, TestLivraison, TestVoiturier
-    └── test_acces.py      # TestAcces, TestCamera, TestBorneTicket, TestPanneauAffichage, TestTeleporteur
+    ├── test_parking.py            # TestParking
+    ├── test_place.py              # TestPlace
+    ├── test_placement.py          # TestPlacement
+    ├── test_voiture.py            # TestVoiture
+    ├── test_camera.py             # TestCamera
+    ├── test_borne_ticket.py       # TestBorneTicket
+    ├── test_panneau_affichage.py  # TestPanneauAffichage
+    ├── test_teleporteur.py        # TestTeleporteur
+    ├── test_acces.py              # TestAcces (intégration, avec Mock)
+    ├── test_controleur.py         # « Se garer » de bout en bout
+    ├── test_client.py             # en pause, Partie 2
+    └── test_services.py           # en pause, Partie 2
 ```
 
-Les fichiers `__init__.py` sont vides. Ils permettent d'importer les classes d'un dossier à l'autre, par exemple `from modele.parking import Parking` dans les tests.
+Les fichiers `__init__.py` ne contiennent qu'une docstring. Ils permettent d'importer les classes d'un dossier à l'autre, par exemple `from modele.parking import Parking` dans les tests.
 
 L'application suit le patron MVC : le modèle ne connaît ni la vue ni le contrôleur, ce qui permet de le tester seul.
 
