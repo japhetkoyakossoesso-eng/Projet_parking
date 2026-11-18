@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Tests
+.coverage
+.pytest_cache/
+
+# IDE
+.vscode/

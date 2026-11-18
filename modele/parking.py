@@ -1,9 +1,10 @@
 """
 Classes Parking, Place et Placement.
-
-Partie 0 : seules les signatures et la documentation sont écrites.
-Le code des méthodes sera implémenté à partir de la Partie 1.
 """
+
+from datetime import datetime
+
+from modele.exceptions import PlaceOccupeeError, PlaceIncompatibleError, VoitureDejaGareeError
 
 
 class Parking:
@@ -16,14 +17,32 @@ class Parking:
 
     prix = 0  # attribut de classe (souligné dans le diagramme)
 
-    def __init__(self, nbNiveaux, nbPlacesParNiveau):
-        """
-        Crée le parking.
+    _instance = None  # l'instance unique du singleton
 
-        :param nbNiveaux: nombre de niveaux du parking
-        :param nbPlacesParNiveau: nombre de places par niveau
+    def __new__(cls, *args, **kwargs):
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        Renvoie toujours la même instance : la crée au premier appel seulement.
+        """
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialise = False
+        return cls._instance
+
+    def __init__(self, nbNiveaux=1, nbPlacesParNiveau=0):
+        """
+        Crée le parking. Les appels suivants à Parking() ne changent rien.
+
+        :param nbNiveaux: nombre de niveaux du parking (A, B, C...)
+        :param nbPlacesParNiveau: nombre de places prévues par niveau
+        """
+        if self._initialise:
+            return
+        self.nbNiveaux = nbNiveaux                    # + public
+        self.__nbPlacesParNiveau = nbPlacesParNiveau  # - privé
+        self.__places = {}                            # idPlace -> Place
+        self.mesAbonnements = []
+        self.mesVoituriers = []
+        self._initialise = True
 
     @classmethod
     def _reinitialiser(cls):
@@ -33,7 +52,39 @@ class Parking:
         Appelée dans le tearDown() des classes de test pour que chaque test
         reparte d'un parking neuf.
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        cls._instance = None
+
+    def niveaux(self):
+        """
+        :return: la liste des lettres de niveau, par exemple ['A', 'B']
+        """
+        return [chr(ord('A') + i) for i in range(self.nbNiveaux)]
+
+    def ajouterPlace(self, place):
+        """
+        Ajoute une place au parking (ajout au diagramme : il faut bien créer les places).
+
+        :param place: la place à ajouter (Place)
+        :raises ValueError: si une place avec le même idPlace existe déjà,
+            ou si son niveau n'existe pas dans le parking
+        """
+        if place.idPlace in self.__places:
+            raise ValueError(f"La place {place.idPlace} existe déjà")
+        if place.niveau not in self.niveaux():
+            raise ValueError(f"Le niveau {place.niveau} n'existe pas")
+        self.__places[place.idPlace] = place
+
+    def getPlace(self, idPlace):
+        """
+        :param idPlace: identifiant de la place, par exemple "A1"
+        :return: la place (Place), ou None si elle n'existe pas
+        """
+        return self.__places.get(idPlace)
+
+    @property
+    def mesPlaces(self):
+        """:return: la liste de toutes les places du parking"""
+        return list(self.__places.values())
 
     @property
     def nbPlacesLibres(self):
@@ -42,7 +93,7 @@ class Parking:
 
         :return: un entier
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        return sum(1 for place in self.__places.values() if place.estLibre)
 
     def rechercherPlace(self, v):
         """
@@ -54,7 +105,10 @@ class Parking:
         :param v: la voiture à garer (Voiture)
         :return: la place trouvée (Place), ou None si aucune ne convient
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        for place in self.__places.values():
+            if place.estLibre and place.estCompatible(v):
+                return place
+        return None
 
     def nbPlacesLibresParNiveau(self, niveau):
         """
@@ -64,7 +118,10 @@ class Parking:
         :return: le nombre de places libres (int)
         :raises ValueError: si le niveau n'existe pas
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        if niveau not in self.niveaux():
+            raise ValueError(f"Le niveau {niveau} n'existe pas")
+        return sum(1 for place in self.__places.values()
+                   if place.niveau == niveau and place.estLibre)
 
     def addAbonnement(self, ab):
         """
@@ -72,7 +129,19 @@ class Parking:
 
         :param ab: l'abonnement à ajouter (Abonnement)
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        if ab not in self.mesAbonnements:
+            self.mesAbonnements.append(ab)
+
+    def voiturierDisponible(self):
+        """
+        Renvoie un voiturier pour une livraison (en crée un s'il n'y en a aucun).
+
+        :return: un Voiturier
+        """
+        if not self.mesVoituriers:
+            from modele.services import Voiturier
+            self.mesVoituriers.append(Voiturier(1))
+        return self.mesVoituriers[0]
 
     def historiquePassages(self):
         """
@@ -82,7 +151,10 @@ class Parking:
 
         :return: une liste de Placement
         """
-        raise NotImplementedError("À implémenter en Partie 3")
+        historique = []
+        for place in self.__places.values():
+            historique.extend(place.mesPlacements)
+        return historique
 
 
 class Place:
@@ -98,7 +170,30 @@ class Place:
         :param hauteur: hauteur de la place en mètres (float)
         :raises ValueError: si une dimension est négative ou nulle
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        if longueur <= 0 or hauteur <= 0:
+            raise ValueError("Les dimensions d'une place doivent être positives")
+        self.numero = numero        # + public
+        self.__niveau = niveau      # - privé
+        self.__longueur = longueur
+        self.__hauteur = hauteur
+        self.__estLibre = True
+        self.mesPlacements = []     # tous les placements passés et en cours
+
+    @property
+    def niveau(self):
+        return self.__niveau
+
+    @property
+    def longueur(self):
+        return self.__longueur
+
+    @property
+    def hauteur(self):
+        return self.__hauteur
+
+    @property
+    def estLibre(self):
+        return self.__estLibre
 
     @property
     def idPlace(self):
@@ -107,7 +202,16 @@ class Place:
 
         :return: une chaîne
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        return f"{self.__niveau}{self.numero}"
+
+    def estCompatible(self, v):
+        """
+        Vérifie que la voiture v tient dans la place (dimensions égales acceptées).
+
+        :param v: la voiture (Voiture)
+        :return: True si la voiture tient, False sinon
+        """
+        return v.hauteur <= self.__hauteur and v.longueur <= self.__longueur
 
     def addPlacementP(self, p):
         """
@@ -117,7 +221,16 @@ class Place:
         :raises PlaceOccupeeError: si la place est déjà occupée
         :raises PlaceIncompatibleError: si la voiture est trop grande pour la place
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        if not self.__estLibre:
+            raise PlaceOccupeeError(f"La place {self.idPlace} est déjà occupée")
+        if not self.estCompatible(p.voiture):
+            raise PlaceIncompatibleError(f"La voiture ne tient pas dans la place {self.idPlace}")
+        self.mesPlacements.append(p)
+        self.__estLibre = False
+
+    def liberer(self):
+        """Rend la place libre. Appelée par Placement.partirPlace()."""
+        self.__estLibre = True
 
 
 class Placement:
@@ -129,12 +242,22 @@ class Placement:
 
     def __init__(self, voiture, place):
         """
-        Crée un placement en cours, daté d'aujourd'hui.
+        Crée un placement en cours, daté de maintenant, et gare la voiture.
 
         :param voiture: la voiture garée (Voiture)
         :param place: la place occupée (Place)
+        :raises VoitureDejaGareeError: si la voiture est déjà dans le parking
+        :raises PlaceOccupeeError: si la place est déjà occupée
+        :raises PlaceIncompatibleError: si la voiture est trop grande pour la place
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        if voiture.estDansParking:
+            raise VoitureDejaGareeError(f"La voiture {voiture.immatriculation} est déjà garée")
+        self.voiture = voiture
+        self.place = place
+        self.dateDebut = datetime.now()
+        self.dateFin = None
+        place.addPlacementP(self)    # vérifie la place en premier
+        voiture.addPlacementV(self)  # puis la voiture entre dans le parking
 
     @property
     def estEnCours(self):
@@ -143,7 +266,7 @@ class Placement:
 
         :return: un booléen
         """
-        raise NotImplementedError("À implémenter en Partie 1")
+        return self.dateFin is None
 
     def partirPlace(self):
         """
@@ -151,4 +274,10 @@ class Placement:
 
         :return: True si le placement a été terminé, False s'il l'était déjà
         """
-        raise NotImplementedError("À implémenter en Partie 2")
+        if not self.estEnCours:
+            return False
+        self.dateFin = datetime.now()
+        self.place.liberer()
+        self.voiture.estDansParking = False
+        self.voiture.lieuStationnement = None
+        return True
