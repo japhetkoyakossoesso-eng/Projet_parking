@@ -101,6 +101,38 @@ class ControleurParking:
         return [borne.proposerTypePaiement(),
                 borne.proposerAbonnements(client, self.parking)]
 
+    def raisonRefus(self, client):
+        """
+        Explique pourquoi la voiture du client ne peut pas se garer dans DreamPark.
+
+        :return: la raison (str), ou None si une place libre lui convient
+        """
+        v = client.maVoiture
+        if self.parking.rechercherPlace(v) is not None:
+            return None
+        places = self.parking.mesPlaces
+        hauteurMax = max(p.hauteur for p in places)
+        longueurMax = max(p.longueur for p in places)
+        tropHaute = v.hauteur > hauteurMax
+        tropLongue = v.longueur > longueurMax
+        if tropHaute and tropLongue:
+            return (f"votre voiture est trop haute ({v.hauteur:.2f} m) et trop longue "
+                    f"({v.longueur:.2f} m). Nos places mesurent au plus {hauteurMax:.2f} m "
+                    f"de haut et {longueurMax:.2f} m de long.")
+        if tropHaute:
+            return (f"votre voiture est trop haute ({v.hauteur:.2f} m). "
+                    f"Nos places mesurent au plus {hauteurMax:.2f} m de haut.")
+        if tropLongue:
+            return (f"votre voiture est trop longue ({v.longueur:.2f} m). "
+                    f"Nos places mesurent au plus {longueurMax:.2f} m de long.")
+        compatibles = [p.idPlace for p in places if p.estCompatible(v)]
+        if not compatibles:
+            return "aucune place n'a à la fois la hauteur et la longueur de votre voiture."
+        if self.parking.nbPlacesLibres == 0:
+            return "le parking est complet."
+        return ("les places assez grandes pour votre voiture "
+                f"({', '.join(compatibles)}) sont toutes occupées.")
+
     def seGarer(self, client, numAcces, modePaiement="CB", choixAbonnement=None):
         """
         Lance le use case « Se garer » par l'accès numAcces (1 ou 2).
@@ -108,10 +140,12 @@ class ControleurParking:
         :return: (réussi, message) : réussi est un bool, message le ticket ou l'explication
         """
         acces = self.acces[numAcces - 1]
+        etaitSuperAbonne = client.estSuperAbonne
+        raison = self.raisonRefus(client)
         resultat = acces.lancerProcedureEntree(client, modePaiement, choixAbonnement)
         if resultat == MESSAGE_PLEIN:
-            return False, resultat
-        if client.estSuperAbonne:
+            return False, f"{resultat} : {raison}"
+        if etaitSuperAbonne:
             return True, resultat
         return True, f"Ticket : {resultat}"
 

@@ -11,11 +11,9 @@ class VueConsole:
         print(texte)
 
     def titre(self, texte):
-        """Affiche un titre encadré."""
+        """Affiche un titre, précédé d'une ligne vide."""
         print()
-        print("=" * 50)
         print(texte)
-        print("=" * 50)
 
     def menuPrincipal(self):
         """
@@ -24,6 +22,7 @@ class VueConsole:
         :return: le choix de l'utilisateur (str)
         """
         self.titre("DreamPark : menu principal")
+        print("Où souhaitez-vous aller ?")
         print("1. Nouveau client")
         print("2. Se garer")
         print("3. S'abonner")

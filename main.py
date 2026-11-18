@@ -54,6 +54,14 @@ def seGarer(vue, ctrl):
         return
     numAcces = vue.demanderEntier("Par quel accès entrez-vous (1 ou 2) ? ", 1, 2)
     vue.afficher(f"Carte lue : {ctrl.statut(client)}")
+
+    # Pas de place pour cette voiture : on le dit tout de suite, avec la raison,
+    # sans demander de payer (un super-abonné, lui, part au parking partenaire).
+    raison = ctrl.raisonRefus(client)
+    if raison is not None and not client.estSuperAbonne:
+        vue.afficher(f"Accès refusé : {raison}")
+        return
+
     for texte in ctrl.textesBorne(client, numAcces):
         vue.afficher(texte)
 
@@ -67,8 +75,8 @@ def seGarer(vue, ctrl):
     vue.afficher(message)
     if reussi:
         vue.afficher(f"Voiture garée : {ctrl.lieu(client)}")
-    for texte in ctrl.panneaux():
-        vue.afficher(f"Panneau : {texte}")
+    for numero, texte in enumerate(ctrl.panneaux(), start=1):
+        vue.afficher(f"Panneau de l'accès {numero} : {texte}")
 
 
 def sAbonner(vue, ctrl):

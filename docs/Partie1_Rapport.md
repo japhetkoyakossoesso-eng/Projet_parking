@@ -48,6 +48,8 @@ Le programme suit le patron MVC : la vue n'utilise jamais directement le modèle
 
 Le parking de démonstration a deux niveaux (A et B) de cinq places de tailles différentes. Seules A5 et B5 (6.00 m x 2.50 m) acceptent une voiture de 2.40 m x 5.90 m : cela permet de montrer le cas « parking plein » et le parking partenaire sans créer dix voitures.
 
+Quand une voiture ne peut pas se garer, le menu donne la raison avant de demander le paiement : voiture trop haute, trop longue, ou places assez grandes toutes occupées (avec leur identifiant). Un super-abonné, lui, n'est jamais refusé.
+
 Les saisies sont contrôlées : un nombre invalide, un choix hors du menu ou un champ vide sont redemandés, et une voiture aux dimensions négatives est refusée avec un message.
 
 ## 4. Les tests
@@ -58,7 +60,7 @@ Commande, depuis le dossier `Projet_parking` :
 python3 -m unittest discover -s tests -v
 ```
 
-Résultat : `Ran 112 tests`, `OK (skipped=32)`.
+Résultat : `Ran 117 tests`, `OK (skipped=32)`.
 
 | Fichier | Ce qui est vérifié |
 |---|---|
@@ -71,7 +73,7 @@ Résultat : `Ran 112 tests`, `OK (skipped=32)`.
 | `test_panneau_affichage.py` | Nombre de places affiché : parking vide, après une entrée, plein |
 | `test_teleporteur.py` | Téléportation, absence de place, super-abonné (place libre et parking partenaire) |
 | `test_acces.py` | Scénario complet avec matériel simulé : non-abonné, parking plein, super-abonné |
-| `test_controleur.py` | « Se garer » de bout en bout, sans clavier |
+| `test_controleur.py` | « Se garer » de bout en bout, sans clavier, et raison du refus (trop haute, trop longue, places occupées) |
 
 Les 32 tests mis en pause sont ceux de `test_client.py` et `test_services.py` : ils portent sur les services et la sortie du parking, qui relèvent de la Partie 2.
 

@@ -38,7 +38,7 @@ class TestControleurSeGarer(unittest.TestCase):
         client = self.ctrl.nouveauClient("Bob", "Paris", "CD-456-EF", 2.40, 5.90)
         reussi, message = self.ctrl.seGarer(client, 2)
         self.assertFalse(reussi)
-        self.assertEqual(message, "Aucune place disponible pour votre véhicule")
+        self.assertTrue(message.startswith("Aucune place disponible pour votre véhicule"))
         self.assertEqual(self.ctrl.lieu(client), "hors du parking")
 
     def test_super_abonne_parking_plein_va_au_partenaire(self):
@@ -49,6 +49,35 @@ class TestControleurSeGarer(unittest.TestCase):
         reussi, _ = self.ctrl.seGarer(client, 1)
         self.assertTrue(reussi)
         self.assertEqual(self.ctrl.lieu(client), "parking partenaire")
+
+    def test_raison_voiture_trop_haute(self):
+        client = self.ctrl.nouveauClient("Faess", "x", "FF-111-FF", 3.00, 3.00)
+        self.assertIn("trop haute", self.ctrl.raisonRefus(client))
+
+    def test_raison_voiture_trop_longue(self):
+        client = self.ctrl.nouveauClient("Long", "x", "LL-111-LL", 1.50, 7.00)
+        self.assertIn("trop longue", self.ctrl.raisonRefus(client))
+
+    def test_raison_places_compatibles_occupees(self):
+        for i in range(2):
+            self.ctrl.seGarer(self.ctrl.nouveauClient(f"G{i}", "x", f"GG-{i}", 2.40, 5.90), 1)
+        client = self.ctrl.nouveauClient("Maris", "x", "MM-111-MM", 2.30, 3.00)
+        raison = self.ctrl.raisonRefus(client)
+        self.assertIn("A5", raison)
+        self.assertIn("B5", raison)
+        reussi, message = self.ctrl.seGarer(client, 1)
+        self.assertFalse(reussi)
+        self.assertIn(raison, message)
+
+    def test_pas_de_raison_si_une_place_convient(self):
+        client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)
+        self.assertIsNone(self.ctrl.raisonRefus(client))
+
+    def test_ticket_affiche_si_pack_garantie_pris_a_la_borne(self):
+        client = self.ctrl.nouveauClient("Tim", "x", "ZE-257-FG", 2.00, 4.00)
+        reussi, message = self.ctrl.seGarer(client, 1, "CB", self.ctrl.abonnements[1])
+        self.assertTrue(reussi)
+        self.assertTrue(message.startswith("Ticket : "))
 
     def test_voiture_deja_garee(self):
         client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)
