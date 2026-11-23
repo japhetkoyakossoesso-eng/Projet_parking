@@ -17,7 +17,11 @@ class VueConsole:
 
     
     def menuPrincipal(self):
-       
+        """
+        Affiche le menu principal.
+
+        :return: le choix de l'utilisateur (str)
+        """
         self.titre("DreamPark : menu principal")
         print("Où souhaitez-vous aller ?")
         print("1. Nouveau client")
@@ -26,8 +30,9 @@ class VueConsole:
         print("4. Reprendre ma voiture")
         print("5. Demander un service")
         print("6. Modifier une livraison")
-        print("7. Voir l'état du parking")
-        print("8. Voir les clients")
+        print("7. Réaliser les services en attente")
+        print("8. Voir l'état du parking")
+        print("9. Voir les clients")
         print("0. Quitter")
         return input("Votre choix : ").strip()
 

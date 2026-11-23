@@ -23,9 +23,9 @@ On a aussi ajouté au menu les services pour les abonnés (maintenance, entretie
 |---|---|
 | modele/ | 4 nouvelles méthodes pour la sortie (voir section 5) |
 | tests/ | 32 tests réactivés et nouveau fichier test_sortie.py |
-| vue/ | Menu à 8 choix, saisie d'une date |
-| controleur/ | Sortie, demande de service, modification de livraison |
-| main.py | 3 nouvelles actions de menu |
+| vue/ | Menu à 9 choix, saisie d'une date |
+| controleur/ | Sortie, demande de service, modification de livraison, réalisation des services en attente |
+| main.py | 4 nouvelles actions de menu |
 
 ## 3. Le menu console
 
@@ -36,12 +36,15 @@ On a aussi ajouté au menu les services pour les abonnés (maintenance, entretie
 4. Reprendre ma voiture
 5. Demander un service
 6. Modifier une livraison
-7. Voir l'état du parking
-8. Voir les clients
+7. Réaliser les services en attente
+8. Voir l'état du parking
+9. Voir les clients
 0. Quitter
 ```
 
-Pour reprendre sa voiture, on choisit l'accès puis on tape son ticket (pas besoin pour un super-abonné). On a ajouté une vérification dans le contrôleur : le ticket doit correspondre à la voiture du client, sinon un client pourrait récupérer la voiture d'un autre.
+Pour reprendre sa voiture, on choisit l'accès puis on tape son ticket (pas besoin pour un super-abonné). On a ajouté une vérification dans le contrôleur : le ticket doit correspondre à la voiture du client, sinon un client pourrait récupérer la voiture d'un autre. Une voiture garée au parking partenaire sort sans ticket, même si son propriétaire s'est désabonné entre-temps.
+
+Le choix 7 réalise les services demandés : la maintenance et l'entretien sortent la voiture puis la regarent, la livraison libère la place et le voiturier livre la voiture.
 
 Les services sont réservés aux abonnés. Pour une livraison, l'heure doit être entre 0 et 23 et l'adresse ne doit pas être vide. Comme en Partie 1, les saisies invalides sont redemandées.
 
@@ -53,7 +56,7 @@ Commande :
 python3 -m unittest discover -s tests -v
 ```
 
-Résultat : Ran 130 tests, OK (aucun test ignoré).
+Résultat : Ran 134 tests, OK (aucun test ignoré).
 
 | Fichier | Ce qui est vérifié |
 |---|---|

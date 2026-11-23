@@ -4,6 +4,7 @@ sans passer par le clavier.
 """
 
 import unittest
+from datetime import date
 
 from controleur.controleur_parking import ControleurParking
 from modele.parking import Parking
@@ -78,6 +79,47 @@ class TestControleurSeGarer(unittest.TestCase):
         reussi, message = self.ctrl.seGarer(client, 1, "CB", self.ctrl.abonnements[1])
         self.assertTrue(reussi)
         self.assertTrue(message.startswith("Ticket : "))
+
+    def test_super_abonne_desabonne_recupere_voiture_au_partenaire(self):
+        """Super-abonné garé au partenaire puis désabonné : il récupère sa voiture sans ticket."""
+        for i in range(2):
+            self.ctrl.seGarer(self.ctrl.nouveauClient(f"G{i}", "x", f"GG-{i}", 2.40, 5.90), 1)
+        client = self.ctrl.nouveauClient("Sam", "Albi", "SS-111-SS", 2.40, 5.90)
+        self.ctrl.sAbonner(client, self.ctrl.abonnements[1])
+        self.ctrl.seGarer(client, 1)
+        client.seDesabonner()
+        reussi, _ = self.ctrl.sortir(client, 1)
+        self.assertTrue(reussi)
+        self.assertEqual(self.ctrl.lieu(client), "hors du parking")
+
+    def test_realiser_maintenance_regare_la_voiture(self):
+        """Maintenance en attente : réalisée, la voiture est regarée."""
+        client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)
+        self.ctrl.seGarer(client, 1, "CB", self.ctrl.abonnements[0])
+        self.ctrl.demanderService(client, "maintenance")
+        messages = self.ctrl.realiserServices(client)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(self.ctrl.servicesEnAttente(client), [])
+        self.assertTrue(client.maVoiture.estDansParking)
+
+    def test_realiser_livraison_sort_la_voiture(self):
+        """Livraison en attente : réalisée, la place est libérée."""
+        client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)
+        self.ctrl.seGarer(client, 1, "CB", self.ctrl.abonnements[0])
+        self.ctrl.demanderService(client, "livraison", date(2026, 12, 1), 18, "Cinéma ABC")
+        self.ctrl.realiserServices(client)
+        self.assertFalse(client.maVoiture.estDansParking)
+        self.assertEqual(self.ctrl.servicesEnAttente(client), [])
+
+    def test_maintenance_impossible_voiture_dehors(self):
+        """Maintenance demandée mais voiture hors du parking : non réalisée."""
+        client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)
+        self.ctrl.sAbonner(client, self.ctrl.abonnements[0])
+        self.ctrl.demanderService(client, "maintenance")
+        messages = self.ctrl.realiserServices(client)
+        self.assertIn("impossible", messages[0])
+        self.assertFalse(client.maVoiture.estDansParking)
+        self.assertEqual(len(self.ctrl.servicesEnAttente(client)), 1)
 
     def test_voiture_deja_garee(self):
         client = self.ctrl.nouveauClient("Alice", "Toulouse", "AB-123-CD", 1.80, 4.50)

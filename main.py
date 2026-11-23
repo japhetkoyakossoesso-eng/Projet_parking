@@ -1,7 +1,7 @@
 """
 Point d'entrée de l'application DreamPark.
 
-Partie 2 : menus « Se garer », « Reprendre la voiture » et services. »
+Partie 2 : menus « Se garer », « Reprendre la voiture » et services.
 Lancement : python3 main.py (python main.py sous Windows).
 """
 
@@ -138,6 +138,19 @@ def modifierLivraison(vue, ctrl):
     reussi, message = ctrl.modifierLivraison(client, dateLiv, heure, adresse)
     vue.afficher(message)
 
+def realiserServices(vue, ctrl):
+    """Réalise les services en attente d'un client (maintenance, entretien, livraison)."""
+    vue.titre("Réaliser les services en attente")
+    client = choisirClient(vue, ctrl)
+    if client is None:
+        return
+    messages = ctrl.realiserServices(client)
+    if not messages:
+        vue.afficher(f"{client.nom} n'a aucun service en attente.")
+    for message in messages:
+        vue.afficher(message)
+
+
 def etatParking(vue, ctrl):
     """Affiche les panneaux et l'état de chaque place."""
     vue.titre("État du parking")
@@ -163,8 +176,9 @@ def main():
     ctrl = ControleurParking()
     actions = {  "1": nouveauClient,"2": seGarer, 
                  "3": sAbonner,"4": reprendreVoiture, 
-                 "5": demanderService,"6": modifierLivraison, 
-                 "7": etatParking,"8": voirClients
+                 "5": demanderService,"6": modifierLivraison,
+                 "7": realiserServices,"8": etatParking,
+                 "9": voirClients
                }
     while True:
         try:

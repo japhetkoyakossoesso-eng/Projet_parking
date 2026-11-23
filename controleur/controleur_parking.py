@@ -152,13 +152,17 @@ class ControleurParking:
     # Sortir du parking
     def sortir(self, client, numAcces, ticket=None):
         """
-        Un super-abonné peut sortir sans ticket.
-        Un autre client doit présenter son ticket.
+        Fait sortir la voiture du client par l'accès numAcces.
 
+        Un super-abonné sort sans ticket, tout comme une voiture garée au parking
+        partenaire (même si le client s'est désabonné depuis). Les autres clients
+        doivent présenter leur ticket.
+
+        :return: (réussi, message)
         """
         acces = self.acces[numAcces - 1]
 
-        if client.estSuperAbonne:
+        if client.estSuperAbonne or client.maVoiture.lieuStationnement == PARTENAIRE:
             voiture = acces.lancerProcedureSortieSuperAbonne(client)
         else:
             if ticket is None:
@@ -218,6 +222,33 @@ class ControleurParking:
         except ValueError as e:
             return False, f"Modification refusée : {e}"
         return True, "Livraison modifiée."
+    def servicesEnAttente(self, client):
+        """:return: les services demandés par le client et pas encore réalisés (list)"""
+        return [s for s in client.mesServices if not s.estEffectue]
+
+    def realiserServices(self, client):
+        """
+        Réalise les services en attente du client : maintenance et entretien
+        (la voiture est sortie puis regarée), livraison (le voiturier livre la voiture).
+
+        :return: un message par service (list de str)
+        """
+        from modele.services import Maintenance, Entretien, Livraison
+        messages = []
+        for service in self.servicesEnAttente(client):
+            if isinstance(service, Livraison):
+                service.effectuerLivraison()
+                messages.append(f"Livraison faite : {service.rapport}")
+            elif not service.voiture.estDansParking:
+                messages.append("Maintenance ou entretien impossible : la voiture n'est pas dans le parking.")
+            elif isinstance(service, Maintenance):
+                service.effectuerMaintenance()
+                messages.append(f"{service.rapport}, voiture regarée : {self.lieu(client)}")
+            elif isinstance(service, Entretien):
+                service.effectuerEntretien()
+                messages.append(f"{service.rapport}, voiture regarée : {self.lieu(client)}")
+        return messages
+
     # Affichage du parking
 
     def panneaux(self):

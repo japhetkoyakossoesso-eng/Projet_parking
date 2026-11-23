@@ -265,10 +265,13 @@ class Acces:
         """
         Déroule la procédure de sortie d'un super-abonné sans ticket.
 
+        Le statut n'est pas vérifié : un client qui s'est désabonné pendant que sa
+        voiture était au parking partenaire doit pouvoir la récupérer.
+
         :param client: le super-abonné (Client)
         :return: la voiture récupérée (Voiture), ou None si elle n'est pas garée
         """
-        if not client.estSuperAbonne or client.maVoiture is None:
+        if client.maVoiture is None:
             return None
 
         voiture = client.maVoiture
