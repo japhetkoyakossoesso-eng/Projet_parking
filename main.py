@@ -1,7 +1,7 @@
 """
 Point d'entrée de l'application DreamPark.
 
-Partie 2 : menus « Se garer », « Reprendre la voiture » et services.
+Menu console : se garer, reprendre sa voiture, s'abonner et demander des services.
 Lancement : python3 main.py (python main.py sous Windows).
 """
 
@@ -88,6 +88,7 @@ def sAbonner(vue, ctrl):
     ctrl.sAbonner(client, choisirAbonnement(vue, ctrl))
     vue.afficher(f"{client.nom} est maintenant {ctrl.statut(client)}.")
 
+
 def reprendreVoiture(vue, ctrl):
     """Déroule le use case « Reprendre la voiture » pour un client choisi."""
     vue.titre("Reprendre ma voiture")
@@ -138,6 +139,7 @@ def modifierLivraison(vue, ctrl):
     reussi, message = ctrl.modifierLivraison(client, dateLiv, heure, adresse)
     vue.afficher(message)
 
+
 def realiserServices(vue, ctrl):
     """Réalise les services en attente d'un client (maintenance, entretien, livraison)."""
     vue.titre("Réaliser les services en attente")
@@ -174,12 +176,17 @@ def main():
     """Lance l'application DreamPark."""
     vue = VueConsole()
     ctrl = ControleurParking()
-    actions = {  "1": nouveauClient,"2": seGarer, 
-                 "3": sAbonner,"4": reprendreVoiture, 
-                 "5": demanderService,"6": modifierLivraison,
-                 "7": realiserServices,"8": etatParking,
-                 "9": voirClients
-               }
+    actions = {
+        "1": nouveauClient,
+        "2": seGarer,
+        "3": sAbonner,
+        "4": reprendreVoiture,
+        "5": demanderService,
+        "6": modifierLivraison,
+        "7": realiserServices,
+        "8": etatParking,
+        "9": voirClients,
+    }
     while True:
         try:
             choix = vue.menuPrincipal()

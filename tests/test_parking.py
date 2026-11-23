@@ -23,7 +23,6 @@ class TestParking(unittest.TestCase):
         self.voiture = Voiture("AB-123-CD", 1.80, 4.50)
 
     # TESTS DU PARKING
-
     def test_parking_est_un_singleton(self):
         autre_parking = Parking()
         self.assertIs(self.parking, autre_parking)
@@ -82,7 +81,6 @@ class TestParking(unittest.TestCase):
         self.assertEqual(len(self.parking.mesAbonnements), 1)
 
     # TESTS DE RECHERCHE DE PLACE
-
     def test_rechercher_place_compatible(self):
         place = self.parking.rechercherPlace(self.voiture)
 
@@ -119,7 +117,6 @@ class TestParking(unittest.TestCase):
         self.assertIs(place, self.place2)
 
     # TESTS DE L'HISTORIQUE
-
     def test_historique_initialement_vide(self):
         self.assertEqual(self.parking.historiquePassages(), [])
 

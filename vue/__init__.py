@@ -1,1 +1,1 @@
-"""Vue (patron MVC) : affichage console, puis interface tkinter en Partie 4."""
+"""Vue (patron MVC) : affichage console du parking."""
