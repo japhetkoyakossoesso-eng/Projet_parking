@@ -27,7 +27,7 @@ class Voiture:
         self.__hauteur = hauteur
         self.__longueur = longueur
         self.estDansParking = False               # + public
-        self.lieuStationnement = None             # ajout : "A1", "PARTENAIRE" ou None
+        self.lieuStationnement = None             # "A1", "PARTENAIRE" ou None
         self.mesPlacements = []
 
     @property

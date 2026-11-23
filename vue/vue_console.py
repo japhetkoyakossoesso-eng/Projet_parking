@@ -3,6 +3,7 @@ Vue console de l'application : affiche les menus et lit ce que tape l'utilisateu
 """
 from datetime import datetime
 
+
 class VueConsole:
     """Tout ce qui s'affiche à l'écran ou se lit au clavier passe par cette classe."""
 
@@ -15,7 +16,7 @@ class VueConsole:
         print()
         print(texte)
 
-    
+
     def menuPrincipal(self):
         """
         Affiche le menu principal.

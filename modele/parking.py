@@ -15,7 +15,7 @@ class Parking:
     (niveau + numéro, par exemple « A1 »), et des abonnements qu'il propose.
     """
 
-    prix = 0  # attribut de classe (souligné dans le diagramme)
+    prix = 0  # attribut de classe
 
     _instance = None  # l'instance unique du singleton
 
@@ -62,7 +62,7 @@ class Parking:
 
     def ajouterPlace(self, place):
         """
-        Ajoute une place au parking (ajout au diagramme : il faut bien créer les places).
+        Ajoute une place au parking.
 
         :param place: la place à ajouter (Place)
         :raises ValueError: si une place avec le même idPlace existe déjà,
@@ -145,9 +145,7 @@ class Parking:
 
     def historiquePassages(self):
         """
-        Renvoie tous les placements, terminés ou en cours (trace de passage).
-
-        Ajout au diagramme fourni, justifié par RF09 et RF10 (statistiques).
+        Renvoie tous les placements, terminés ou en cours. Sert pour les statistiques.
 
         :return: une liste de Placement
         """

@@ -35,7 +35,6 @@ class ControleurParking:
                 self.parking.ajouterPlace(Place(numero, niveau, longueur, hauteur))
 
     # Clients
-
     def nouveauClient(self, nom, adresse, immat, hauteur, longueur):
         """
         Crée un client et sa voiture.
@@ -72,7 +71,6 @@ class ControleurParking:
         return f"place {lieu}"
 
     # Abonnements
-
     def getAbonnement(self, indice):
         """:return: la formule numéro indice (à partir de 1), ou None"""
         if 1 <= indice <= len(self.abonnements):
@@ -84,7 +82,6 @@ class ControleurParking:
         client.sAbonner(abonnement)
 
     # Se garer
-
     def estDejaGare(self, client):
         """:return: vrai si la voiture du client est déjà prise en charge (bool)"""
         return client.maVoiture.lieuStationnement is not None
@@ -176,7 +173,7 @@ class ControleurParking:
             return False, "Impossible de récupérer votre voiture."
 
         return True, "Votre voiture vous a été rendue."
-        
+
     # Services
     def livraisonEnAttente(self, client):
         """:return: la livraison non effectuée du client (Livraison), ou None"""
@@ -222,6 +219,7 @@ class ControleurParking:
         except ValueError as e:
             return False, f"Modification refusée : {e}"
         return True, "Livraison modifiée."
+
     def servicesEnAttente(self, client):
         """:return: les services demandés par le client et pas encore réalisés (list)"""
         return [s for s in client.mesServices if not s.estEffectue]
@@ -250,7 +248,6 @@ class ControleurParking:
         return messages
 
     # Affichage du parking
-
     def panneaux(self):
         """:return: le texte des deux panneaux (list de str)"""
         return [a.actionnerPanneau() for a in self.acces]

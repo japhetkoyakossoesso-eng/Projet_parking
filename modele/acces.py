@@ -63,8 +63,8 @@ class BorneTicket:
         immatriculation sans tirets et heure d'entrée (par exemple « A1-AB123CD-0930 »).
 
         :param c: le client (Client)
-        :param place: la place attribuée (Place) ; ajout au diagramme pour pouvoir
-            délivrer le ticket avant la téléportation, comme dans le diagramme d'activité
+        :param place: la place attribuée (Place), car le ticket est délivré
+            avant que la voiture soit téléportée
         :return: le ticket (str), ou None si aucune place n'est attribuée
         """
         if c.maVoiture is None:
@@ -208,12 +208,12 @@ class Acces:
 
     def lancerProcedureEntree(self, c, modePaiement="CB", choixAbonnement=None):
         """
-        Déroule le scénario « Se garer » (diagramme d'activité) pour le client c.
+        Fait entrer le client c dans le parking (scénario « Se garer »).
 
         :param c: le client (Client)
-        :param modePaiement: "CB" ou "espèces", pour un client non abonné (ajout)
+        :param modePaiement: "CB" ou "espèces", pour un client non abonné
         :param choixAbonnement: formule choisie à la borne par un client non abonné,
-            ou None s'il n'en prend pas (ajout)
+            ou None s'il n'en prend pas
         :return: le ticket, un message pour un super-abonné,
             ou le message « Aucune place disponible pour votre véhicule »
         """
