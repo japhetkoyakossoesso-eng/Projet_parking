@@ -1,7 +1,7 @@
 """
 Vue console de l'application : affiche les menus et lit ce que tape l'utilisateur.
 """
-
+from datetime import datetime
 
 class VueConsole:
     """Tout ce qui s'affiche à l'écran ou se lit au clavier passe par cette classe."""
@@ -15,6 +15,7 @@ class VueConsole:
         print()
         print(texte)
 
+    
     def menuPrincipal(self):
         """
         Affiche le menu principal.
@@ -26,10 +27,15 @@ class VueConsole:
         print("1. Nouveau client")
         print("2. Se garer")
         print("3. S'abonner")
-        print("4. Voir l'état du parking")
-        print("5. Voir les clients")
+        print("4. Reprendre ma voiture")
+        print("5. Demander un service")
+        print("6. Modifier une livraison")
+        print("7. Réaliser les services en attente")
+        print("8. Voir l'état du parking")
+        print("9. Voir les clients")
         print("0. Quitter")
         return input("Votre choix : ").strip()
+
 
     def demanderTexte(self, question):
         """:return: le texte saisi, non vide (str)"""
@@ -70,3 +76,12 @@ class VueConsole:
         """Affiche une liste numérotée à partir de 1."""
         for i, ligne in enumerate(lignes, start=1):
             print(f"  {i}. {ligne}")
+
+    def demanderDate(self, question):
+        """:return: la date saisie au format jj/mm/aaaa (date)"""
+        while True:
+            reponse = input(question + " (jj/mm/aaaa) : ").strip()
+            try:
+                return datetime.strptime(reponse, "%d/%m/%Y").date()
+            except ValueError:
+                print("Date invalide, exemple : 25/12/2026.")

@@ -145,6 +145,21 @@ class Teleporteur:
         v.lieuStationnement = PARTENAIRE
         return "Voiture garée dans le parking partenaire"
 
+    def ramenerVoiture(self, placement):
+        """
+        Ramène une voiture à l'accès et termine son placement.
+
+        :param placement: le placement en cours (Placement)
+        :return: la voiture récupérée (Voiture)
+        """
+        if placement is None or not placement.estEnCours:
+            return None
+
+        voiture = placement.voiture
+        placement.partirPlace()
+
+        return voiture
+
 
 class Acces:
     """
@@ -227,3 +242,63 @@ class Acces:
         self.telEntree.teleporterVoiture(v, place)
         self.actionnerPanneau()
         return ticket
+
+    def lancerProcedureSortie(self, ticket):
+        """
+        Déroule la procédure de sortie à partir du ticket.
+
+        :param ticket: le ticket présenté par le client (str)
+        :return: la voiture récupérée (Voiture), ou None si le ticket est invalide
+        """
+        placement = self.monParking.retrouverPlacement(ticket)
+
+        if placement is None:
+            return None
+
+        voiture = self.telSortie.ramenerVoiture(placement)
+
+        self.actionnerPanneau()
+
+        return voiture
+
+    def lancerProcedureSortieSuperAbonne(self, client):
+        """
+        Déroule la procédure de sortie d'un super-abonné sans ticket.
+
+        Le statut n'est pas vérifié : un client qui s'est désabonné pendant que sa
+        voiture était au parking partenaire doit pouvoir la récupérer.
+
+        :param client: le super-abonné (Client)
+        :return: la voiture récupérée (Voiture), ou None si elle n'est pas garée
+        """
+        if client.maVoiture is None:
+            return None
+
+        voiture = client.maVoiture
+
+        # Cas 1 : voiture garée dans DreamPark
+        if voiture.estDansParking:
+            placement = None
+
+            for place in self.monParking.mesPlaces:
+                for p in place.mesPlacements:
+                    if p.voiture is voiture and p.estEnCours:
+                        placement = p
+                        break
+                if placement is not None:
+                    break
+
+            if placement is None:
+                return None
+
+            voiture = self.telSortie.ramenerVoiture(placement)
+
+        # Cas 2 : voiture garée dans le parking partenaire
+        elif voiture.lieuStationnement == PARTENAIRE:
+            voiture.lieuStationnement = None
+
+        else:
+            return None
+
+        self.actionnerPanneau()
+        return voiture

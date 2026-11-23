@@ -1,7 +1,7 @@
 """
 Point d'entrée de l'application DreamPark.
 
-Partie 1 : menu console pour le use case « Se garer ».
+Partie 2 : menus « Se garer », « Reprendre la voiture » et services.
 Lancement : python3 main.py (python main.py sous Windows).
 """
 
@@ -88,6 +88,68 @@ def sAbonner(vue, ctrl):
     ctrl.sAbonner(client, choisirAbonnement(vue, ctrl))
     vue.afficher(f"{client.nom} est maintenant {ctrl.statut(client)}.")
 
+def reprendreVoiture(vue, ctrl):
+    """Déroule le use case « Reprendre la voiture » pour un client choisi."""
+    vue.titre("Reprendre ma voiture")
+    client = choisirClient(vue, ctrl)
+    if client is None:
+        return
+    if not client.maVoiture.estDansParking and ctrl.lieu(client) != "parking partenaire":
+        vue.afficher(f"La voiture de {client.nom} n'est pas garée.")
+        return
+    numAcces = vue.demanderEntier("Par quel accès sortez-vous (1 ou 2) ? ", 1, 2)
+    ticket = None
+    if not client.estSuperAbonne:
+        ticket = vue.demanderTexte("Votre ticket (ex. A1-AB123CD-0930) : ")
+    reussi, message = ctrl.sortir(client, numAcces, ticket)
+    vue.afficher(message)
+    for numero, texte in enumerate(ctrl.panneaux(), start=1):
+        vue.afficher(f"Panneau de l'accès {numero} : {texte}")
+
+
+def demanderService(vue, ctrl):
+    """Fait demander un service (maintenance, entretien, livraison) à un client."""
+    vue.titre("Demander un service")
+    client = choisirClient(vue, ctrl)
+    if client is None:
+        return
+    vue.afficherListe(["Maintenance", "Entretien", "Livraison"])
+    choix = vue.demanderEntier("Service : ", 1, 3)
+    if choix == 3:
+        dateLiv = vue.demanderDate("Date de livraison")
+        heure = vue.demanderEntier("Heure de livraison (0-23) : ", 0, 23)
+        adresse = vue.demanderTexte("Adresse de livraison : ")
+        reussi, message = ctrl.demanderService(client, "livraison", dateLiv, heure, adresse)
+    else:
+        typeService = ["maintenance", "entretien"][choix - 1]
+        reussi, message = ctrl.demanderService(client, typeService)
+    vue.afficher(message)
+
+
+def modifierLivraison(vue, ctrl):
+    """Modifie la livraison en attente d'un client."""
+    vue.titre("Modifier une livraison")
+    client = choisirClient(vue, ctrl)
+    if client is None:
+        return
+    dateLiv = vue.demanderDate("Nouvelle date")
+    heure = vue.demanderEntier("Nouvelle heure (0-23) : ", 0, 23)
+    adresse = vue.demanderTexte("Nouvelle adresse : ")
+    reussi, message = ctrl.modifierLivraison(client, dateLiv, heure, adresse)
+    vue.afficher(message)
+
+def realiserServices(vue, ctrl):
+    """Réalise les services en attente d'un client (maintenance, entretien, livraison)."""
+    vue.titre("Réaliser les services en attente")
+    client = choisirClient(vue, ctrl)
+    if client is None:
+        return
+    messages = ctrl.realiserServices(client)
+    if not messages:
+        vue.afficher(f"{client.nom} n'a aucun service en attente.")
+    for message in messages:
+        vue.afficher(message)
+
 
 def etatParking(vue, ctrl):
     """Affiche les panneaux et l'état de chaque place."""
@@ -112,8 +174,12 @@ def main():
     """Lance l'application DreamPark."""
     vue = VueConsole()
     ctrl = ControleurParking()
-    actions = {"1": nouveauClient, "2": seGarer, "3": sAbonner,
-               "4": etatParking, "5": voirClients}
+    actions = {  "1": nouveauClient,"2": seGarer, 
+                 "3": sAbonner,"4": reprendreVoiture, 
+                 "5": demanderService,"6": modifierLivraison,
+                 "7": realiserServices,"8": etatParking,
+                 "9": voirClients
+               }
     while True:
         try:
             choix = vue.menuPrincipal()
