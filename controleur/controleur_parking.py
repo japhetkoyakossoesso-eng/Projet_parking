@@ -149,6 +149,75 @@ class ControleurParking:
             return True, resultat
         return True, f"Ticket : {resultat}"
 
+    # Sortir du parking
+    def sortir(self, client, numAcces, ticket=None):
+        """
+        Un super-abonné peut sortir sans ticket.
+        Un autre client doit présenter son ticket.
+
+        """
+        acces = self.acces[numAcces - 1]
+
+        if client.estSuperAbonne:
+            voiture = acces.lancerProcedureSortieSuperAbonne(client)
+        else:
+            if ticket is None:
+                return False, "Vous devez présenter votre ticket."
+            placement = self.parking.retrouverPlacement(ticket)
+            if placement is not None and placement.voiture is not client.maVoiture:
+                return False, "Ce ticket ne correspond pas à votre voiture."
+            voiture = acces.lancerProcedureSortie(ticket)
+
+        if voiture is None:
+            return False, "Impossible de récupérer votre voiture."
+
+        return True, "Votre voiture vous a été rendue."
+        
+    # Services
+    def livraisonEnAttente(self, client):
+        """:return: la livraison non effectuée du client (Livraison), ou None"""
+        from modele.services import Livraison
+        for service in client.mesServices:
+            if isinstance(service, Livraison) and not service.estEffectue:
+                return service
+        return None
+
+    def demanderService(self, client, typeService, dateLiv=None, heure=None, adresse=None):
+        """
+        Demande un service pour le client (réservé aux abonnés).
+
+        :param typeService: "maintenance", "entretien" ou "livraison"
+        :return: (réussi, message)
+        """
+        if not client.estAbonne:
+            return False, "Les services sont réservés aux abonnés."
+        try:
+            if typeService == "maintenance":
+                service = client.demanderMaintenance()
+            elif typeService == "entretien":
+                service = client.demanderEntretien()
+            else:
+                service = client.demanderLivraison(dateLiv, heure, adresse)
+        except ValueError as e:
+            return False, f"Demande refusée : {e}"
+        if service is False:
+            return False, "Les services sont réservés aux abonnés."
+        return True, f"Demande de {typeService} enregistrée."
+
+    def modifierLivraison(self, client, dateLiv, heure, adresse):
+        """
+        Modifie la livraison en attente du client.
+
+        :return: (réussi, message)
+        """
+        livraison = self.livraisonEnAttente(client)
+        if livraison is None:
+            return False, "Vous n'avez aucune livraison en attente."
+        try:
+            livraison.modifier(dateLiv, heure, adresse)
+        except ValueError as e:
+            return False, f"Modification refusée : {e}"
+        return True, "Livraison modifiée."
     # Affichage du parking
 
     def panneaux(self):

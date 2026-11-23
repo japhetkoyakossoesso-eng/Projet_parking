@@ -156,6 +156,37 @@ class Parking:
             historique.extend(place.mesPlacements)
         return historique
 
+    def retrouverPlacement(self, ticket):
+        """
+        Retrouve un placement actif à partir d'un ticket.
+
+        :param ticket: ticket au format A1-AB123CD-0930
+        :return: le Placement correspondant, ou None
+        """
+        if not isinstance(ticket, str):
+            return None
+
+        parties = ticket.split("-")
+
+        if len(parties) != 3:
+            return None
+
+        idPlace, immatriculation, heure = parties
+
+        place = self.getPlace(idPlace)
+
+        if place is None:
+            return None
+
+        for placement in place.mesPlacements:
+            if (
+                placement.estEnCours
+                and placement.voiture.immatriculation.replace("-", "") == immatriculation
+            ):
+                return placement
+
+        return None
+
 
 class Place:
     """Une place du parking, identifiée par son niveau et son numéro."""
