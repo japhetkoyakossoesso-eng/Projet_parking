@@ -1,7 +1,8 @@
 """
 Point d'entrée de l'application DreamPark.
 
-Menu console : se garer, reprendre sa voiture, s'abonner et demander des services.
+Menu console : se garer, reprendre sa voiture, s'abonner, demander des services
+et consulter ou éditer les statistiques.
 Lancement : python3 main.py (python main.py sous Windows).
 """
 
@@ -172,6 +173,26 @@ def voirClients(vue, ctrl):
                        for c in ctrl.clients])
 
 
+def consulterStatistiques(vue, ctrl):
+    """Affiche les statistiques du parking à l'écran."""
+    from vue.edition import EditionTexte
+    vue.titre("Statistiques")
+    vue.afficher(EditionTexte().contenu(ctrl.statistiques()))
+
+
+def editerStatistiques(vue, ctrl):
+    """Enregistre les statistiques dans un fichier texte, HTML ou image (SVG)."""
+    vue.titre("Éditer les statistiques")
+    vue.afficherListe(["Texte (.txt)", "Page web (.html)", "Plan du parking (.svg)"])
+    choix = vue.demanderEntier("Format : ", 1, 3)
+    format, extension = [("texte", ".txt"), ("html", ".html"), ("image", ".svg")][choix - 1]
+    chemin = vue.demanderTexte(f"Nom du fichier (sans extension) : ") + extension
+    try:
+        vue.afficher(f"Fichier créé : {ctrl.editerStatistiques(format, chemin)}")
+    except OSError as e:
+        vue.afficher(f"Impossible d'écrire le fichier : {e}")
+
+
 def main():
     """Lance l'application DreamPark."""
     vue = VueConsole()
@@ -186,6 +207,8 @@ def main():
         "7": realiserServices,
         "8": etatParking,
         "9": voirClients,
+        "10": consulterStatistiques,
+        "11": editerStatistiques,
     }
     while True:
         try:

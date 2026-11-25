@@ -185,6 +185,112 @@ class Parking:
 
         return None
 
+    # Statistiques (Partie 3) : tout est calculé à partir de historiquePassages()
+
+    def nbPassages(self, debut=None, fin=None):
+        """
+        Compte les passages (placements) commencés entre debut et fin, bornes incluses.
+
+        :param debut: date ou datetime de début, None pour ne pas limiter
+        :param fin: date ou datetime de fin, None pour ne pas limiter
+        :return: le nombre de passages (int)
+        """
+        return len([p for p in self.historiquePassages() if _dansPeriode(p.dateDebut, debut, fin)])
+
+    def passagesParJour(self):
+        """
+        Regroupe les passages selon le jour d'entrée.
+
+        :return: un dictionnaire {date: nombre de passages}, trié par date
+        """
+        parJour = {}
+        for p in sorted(self.historiquePassages(), key=lambda p: p.dateDebut):
+            jour = p.dateDebut.date()
+            parJour[jour] = parJour.get(jour, 0) + 1
+        return parJour
+
+    def dureeMoyenneStationnement(self):
+        """
+        Durée moyenne des passages terminés. Les placements en cours sont ignorés.
+
+        :return: la durée moyenne en minutes (float), ou None s'il n'y a aucun passage terminé
+        """
+        durees = [(p.dateFin - p.dateDebut).total_seconds() / 60
+                  for p in self.historiquePassages() if not p.estEnCours]
+        if not durees:
+            return None
+        return sum(durees) / len(durees)
+
+    def tauxOccupation(self):
+        """
+        Part des places occupées en ce moment.
+
+        :return: un float entre 0 et 1 (0 si le parking n'a aucune place)
+        """
+        places = self.mesPlaces
+        if not places:
+            return 0.0
+        return (len(places) - self.nbPlacesLibres) / len(places)
+
+    def historiqueVoiture(self, immat):
+        """
+        Les passages d'une voiture, du plus ancien au plus récent.
+
+        :param immat: immatriculation de la voiture (str)
+        :return: une liste de Placement, vide si la voiture n'est jamais venue
+        """
+        passages = [p for p in self.historiquePassages() if p.voiture.immatriculation == immat]
+        return sorted(passages, key=lambda p: p.dateDebut)
+
+    def clientsReguliers(self, clients, seuil):
+        """
+        Les clients non abonnés venus au moins seuil fois : on peut leur proposer un abonnement.
+
+        :param clients: les clients à examiner (list de Client)
+        :param seuil: nombre minimal de passages (int, au moins 1)
+        :return: une liste de Client
+        :raises ValueError: si seuil est inférieur à 1
+        """
+        if seuil < 1:
+            raise ValueError("Le seuil doit être au moins 1")
+        return [c for c in clients if not c.estAbonne and c.nbFrequentations >= seuil]
+
+    def activiteParService(self, clients):
+        """
+        Compte les services demandés par les clients, par type de service.
+
+        :param clients: les clients à examiner (list de Client)
+        :return: {"Maintenance": n, "Entretien": n, "Livraison": n}
+        """
+        activite = {"Maintenance": 0, "Entretien": 0, "Livraison": 0}
+        for c in clients:
+            for service in c.mesServices:
+                nom = type(service).__name__
+                if nom in activite:
+                    activite[nom] += 1
+        return activite
+
+
+def _dansPeriode(moment, debut, fin):
+    """
+    Vrai si moment (datetime) est entre debut et fin, bornes incluses.
+    Une borne de type date couvre toute la journée.
+    """
+    jour = moment.date()
+    if debut is not None:
+        if isinstance(debut, datetime):
+            if moment < debut:
+                return False
+        elif jour < debut:
+            return False
+    if fin is not None:
+        if isinstance(fin, datetime):
+            if moment > fin:
+                return False
+        elif jour > fin:
+            return False
+    return True
+
 
 class Place:
     """Une place du parking, identifiée par son niveau et son numéro."""

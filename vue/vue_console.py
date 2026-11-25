@@ -34,6 +34,8 @@ class VueConsole:
         print("7. Réaliser les services en attente")
         print("8. Voir l'état du parking")
         print("9. Voir les clients")
+        print("10. Consulter les statistiques")
+        print("11. Éditer les statistiques")
         print("0. Quitter")
         return input("Votre choix : ").strip()
 

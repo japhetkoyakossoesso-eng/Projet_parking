@@ -247,6 +247,41 @@ class ControleurParking:
                 messages.append(f"{service.rapport}, voiture regarée : {self.lieu(client)}")
         return messages
 
+    # Statistiques (Partie 3)
+    SEUIL_REGULIER = 3  # nombre de passages à partir duquel on propose un abonnement
+
+    def statistiques(self):
+        """
+        Rassemble les statistiques du parking pour la vue.
+
+        :return: un dictionnaire (voir vue/edition.py pour les clés)
+        """
+        p = self.parking
+        return {
+            "nbPassages": p.nbPassages(),
+            "passagesParJour": p.passagesParJour(),
+            "dureeMoyenne": p.dureeMoyenneStationnement(),
+            "tauxOccupation": p.tauxOccupation(),
+            "clientsReguliers": [c.nom for c in p.clientsReguliers(self.clients, self.SEUIL_REGULIER)],
+            "activiteParService": p.activiteParService(self.clients),
+            "places": [(pl.idPlace, pl.estLibre) for pl in p.mesPlaces],
+        }
+
+    def editerStatistiques(self, format, chemin):
+        """
+        Édite les statistiques dans un fichier.
+
+        :param format: "texte", "html" ou "image"
+        :param chemin: chemin du fichier à créer
+        :return: le chemin du fichier écrit
+        :raises ValueError: si le format est inconnu
+        """
+        from vue.edition import EditionTexte, EditionHTML, EditionImage
+        editions = {"texte": EditionTexte, "html": EditionHTML, "image": EditionImage}
+        if format not in editions:
+            raise ValueError(f"Format inconnu : {format}")
+        return editions[format]().editer(self.statistiques(), chemin)
+
     # Affichage du parking
     def panneaux(self):
         """:return: le texte des deux panneaux (list de str)"""
